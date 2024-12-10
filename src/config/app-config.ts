@@ -1,7 +1,7 @@
 
 
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString, IsUrl, Max, Min, validateSync } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, IsUrl, Max, Min, validateSync, } from 'class-validator';
 
 enum Environment {
   Development = "development",
@@ -11,20 +11,14 @@ enum Environment {
 }
 
 class EnvironmentVariables {
-  @IsOptional()
-  @IsEnum(Environment)
-  NODE_ENV: Environment;
 
+  @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(65535)
+  
   PORT: number;
 
-  @IsString()
-  SUPABASE_KEY: string;
-
-  @IsUrl()
-  SUPABASE_URL: string;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -44,8 +38,7 @@ export function validate(config: Record<string, unknown>) {
 export default () => ({
     PORT: parseInt(process.env.PORT, 10) || 3000,
     NODE_ENV: process.env.NODE_ENV || "development",
-    SUPABASE_KEY: process.env.SUPABASE_KEY,
-    SUPABASE_URL: process.env.SUPABASE_URL,
+    
 
 } as EnvironmentVariables);
   

@@ -1,0 +1,9 @@
+import { IsInt, IsString } from 'class-validator';
+
+export class SignUpDto {
+  @IsString()
+  readonly email: string;
+
+  @IsString()
+  readonly password: string;
+}
