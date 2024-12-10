@@ -1,10 +1,29 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+// import { validate } from 'class-validator';
+import { SupabaseModule } from 'nestjs-supabase-js';
+import appConfig,{validate} from './config/app-config';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate: validate,
+      load:[appConfig],
+    }),
+    SupabaseModule.forRootAsync({
+      inject: [ConfigService],
+      imports: [ConfigModule],
+      useFactory(configService: ConfigService) {
+        console.log(configService.get('PORT'));
+        return {
+          supabaseKey: 'SUPABASE_KEY',
+          supabaseUrl: 'jk',
+        };
+      },
+    })
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
