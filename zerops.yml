@@ -34,7 +34,7 @@ zerops:
       base: nodejs@22
 
       envVariables:
-        - PORT: 3000
+        PORT: 3000
 
       # what ports your app listens on
       # and whether it supports http traffic
