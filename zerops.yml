@@ -33,6 +33,9 @@ zerops:
       # `zsc install nodejs@20`
       base: nodejs@22
 
+      envVariables:
+        - PORT: 3000
+
       # what ports your app listens on
       # and whether it supports http traffic
       ports:
