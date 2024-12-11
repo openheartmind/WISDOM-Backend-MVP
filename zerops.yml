@@ -16,6 +16,7 @@ zerops:
       deployFiles:
         - dist
         - package.json
+        - tsconfig.json
         - node_modules
 
       # *optional*: which files / folders
