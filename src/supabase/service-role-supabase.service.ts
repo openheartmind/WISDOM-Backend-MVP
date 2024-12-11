@@ -9,7 +9,13 @@ export class ServiceRoleSupabaseService {
   constructor(private configService: ConfigService) {
     const { supabaseUrl, supabaseServiceKey } = this.configService;
 
-    this.client = createClient(supabaseUrl, supabaseServiceKey);
+    this.client = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false,
+      }
+    });
   }
 
   getClient() {
