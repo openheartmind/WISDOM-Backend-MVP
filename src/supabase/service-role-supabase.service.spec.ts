@@ -12,7 +12,9 @@ describe('ServiceRoleSupabaseService', () => {
       providers: [ConfigService, ServiceRoleSupabaseService],
     }).compile();
 
-    service = module.get<ServiceRoleSupabaseService>(ServiceRoleSupabaseService);
+    service = module.get<ServiceRoleSupabaseService>(
+      ServiceRoleSupabaseService,
+    );
   });
 
   it('should be defined', () => {
