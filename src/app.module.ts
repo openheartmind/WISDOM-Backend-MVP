@@ -1,19 +1,23 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-// import { validate } from 'class-validator';
-import { SupabaseModule } from 'nestjs-supabase-js';
-import appConfig,{validate} from './config/app-config';
-import { AuthController } from './auth/auth.controller';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
+import { SupabaseModule } from './supabase/supabase.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import appConfig, { validate } from './config/app-config';
 
 @Module({
   imports: [
+    // GLOBAL MODULES
     ConfigModule.forRoot({
       isGlobal: true,
       validate: validate,
       load: [appConfig],
-    })
-  ],
-  controllers: [AuthController],
-  providers: [],
+    }),
+    // Route Modules
+     AuthModule],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
