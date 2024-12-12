@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { ConfigService } from '../config/config.service';
+import appConfig, { EnvironmentVariables, EnvironmentVariablesRecord } from 'src/config/app-config';
+
 
 @Injectable()
 export class ServiceRoleSupabaseService {
   private client: SupabaseClient;
 
-  constructor(private configService: ConfigService) {
-    const { supabaseUrl, supabaseServiceKey } = this.configService;
-
+  constructor(private configService: ConfigService<EnvironmentVariablesRecord>) {
+    const supabaseUrl = this.configService.getOrThrow<string>("SUPABASE_URL")
+    const supabaseServiceKey = this.configService.getOrThrow<string>("SUPABASE_SERVICE_KEY")
     this.client = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,

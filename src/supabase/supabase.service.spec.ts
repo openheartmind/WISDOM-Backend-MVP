@@ -1,6 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigModule } from '../config/config.module';
-import { ConfigService } from '../config/config.service';
 import { SupabaseService } from './supabase.service';
 
 describe('SupabaseService', () => {
@@ -8,8 +6,8 @@ describe('SupabaseService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule],
-      providers: [ConfigService, SupabaseService],
+      imports: [],
+      providers: [SupabaseService],
     }).compile();
 
     service = await module.resolve<SupabaseService>(SupabaseService);
