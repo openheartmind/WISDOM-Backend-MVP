@@ -15,10 +15,8 @@ import appConfig, { validate } from './config/app-config';
       validate: validate,
       load: [appConfig],
     }),
-
     // Route Modules
-
-    AuthModule],
+     AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
