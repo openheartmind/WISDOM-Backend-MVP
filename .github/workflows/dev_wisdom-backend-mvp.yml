@@ -31,7 +31,7 @@ jobs:
         run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: node-app
           path: release.zip
@@ -42,21 +42,21 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
+    
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: node-app
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-
+      
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: 'WISDOM-Backend-MVP'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_94741AAF8A334A929F4A5628C6C35062 }}
           package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FCFCE8B202854F86A7B4F197528368D5 }}
