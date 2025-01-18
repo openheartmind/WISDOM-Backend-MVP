@@ -4,6 +4,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SupabaseModule } from 'nestjs-supabase-js';
 import appConfig,{validate} from './config/app-config';
 import { AuthController } from './auth/auth.controller';
+import { DatabaseModule } from './database';
+import { TestController } from './test/test.controller';
 
 @Module({
   imports: [
@@ -11,9 +13,11 @@ import { AuthController } from './auth/auth.controller';
       isGlobal: true,
       validate: validate,
       load: [appConfig],
-    })
+      envFilePath: ['.env', `.env.${process.env.NODE_ENV}`],
+    }),
+    DatabaseModule,
   ],
-  controllers: [AuthController],
-  providers: [],
+  controllers: [AuthController, TestController],
 })
 export class AppModule {}
+
