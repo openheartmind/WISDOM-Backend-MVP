@@ -8,8 +8,6 @@ dotenv.config({
     : '.env.development'
 });
 
-const isProd = process.env.NODE_ENV === 'production';
-
 export default {
   schema: './src/database/schema/*',
   out: './drizzle',

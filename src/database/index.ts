@@ -1,9 +1,7 @@
-import { Module, Global } from '@nestjs/common';
+import { Module, Global, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { drizzle as drizzlePg } from 'drizzle-orm/node-postgres';
-import { drizzle as drizzleSqlite } from 'drizzle-orm/better-sqlite3';
 import { Pool } from 'pg';
-import Database from 'better-sqlite3';
 import * as schema from './schema';
 
 @Global()
@@ -14,31 +12,37 @@ import * as schema from './schema';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
         const env = process.env.NODE_ENV;
-
-        if (env === 'test') {
-          // SQLite for testing
-          const sqlite = new Database(':memory:');
-          return drizzleSqlite(sqlite, { schema });
-        } 
-        
-        if (env === 'production') {
-          // Supabase connection
-          const pool = new Pool({
-            connectionString: configService.get('DATABASE_URL'),
-            ssl: { rejectUnauthorized: false }
-          });
-          return drizzlePg(pool, { schema });
+        const logger = new Logger('DatabaseModule');
+        let databaseURL: string;
+        logger.log('Using Postgres database');
+        if(env === 'test'){
+          // Supabase connection for both production and development
+          databaseURL = configService.get('TEST_DATABASE_URL');
+        } else {
+          databaseURL = configService.get('DATABASE_URL');
         }
-
-        // Local Postgres for development
+        // Supabase connection for both production and development
         const pool = new Pool({
-          host: configService.get('DB_HOST'),
-          port: configService.get('DB_PORT'),
-          user: configService.get('DB_USER'),
-          password: configService.get('DB_PASSWORD'),
-          database: configService.get('DB_NAME'),
+          connectionString: databaseURL,
+          ssl: env === 'production' ? { rejectUnauthorized: false } : false,
         });
-        return drizzlePg(pool, { schema });
+
+        try {
+          const client = await pool.connect();
+          if (env === 'development') {
+            const result = await client.query('SELECT current_database(), current_user, version();');
+            logger.log('Connected to database:', {
+              database: result.rows[0].current_database,
+              user: result.rows[0].current_user,
+              version: result.rows[0].version
+            });
+          }
+          client.release();
+          return drizzlePg(pool, { schema });
+        } catch (error) {
+          // logger.error('Database connection error:', error);
+          throw error;
+        }
       },
     },
   ],
