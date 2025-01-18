@@ -13,13 +13,16 @@ import * as schema from './schema';
       useFactory: async (configService: ConfigService) => {
         const env = process.env.NODE_ENV;
         const logger = new Logger('DatabaseModule');
-        let databaseURL: string;
+        
         logger.log('Using Postgres database');
         
-        databaseURL = configService.get('DATABASE_URL');
-        // Supabase connection for both production and development
+        // Create connection pool with individual parameters
         const pool = new Pool({
-          connectionString: databaseURL,
+          host: configService.get('DB_HOST'),
+          port: configService.get('DB_PORT'),
+          database: configService.get('DB_NAME'),
+          user: configService.get('DB_USER'),
+          password: configService.get('DB_PASSWORD'),
           ssl: env === 'production' ? { rejectUnauthorized: false } : false,
         });
 
@@ -36,7 +39,7 @@ import * as schema from './schema';
           client.release();
           return drizzlePg(pool, { schema });
         } catch (error) {
-          // logger.error('Database connection error:', error);
+          logger.error('Database connection error:', error);
           throw error;
         }
       },

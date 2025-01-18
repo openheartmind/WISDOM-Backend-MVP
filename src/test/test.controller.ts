@@ -4,6 +4,7 @@ import * as schema from '../database/schema';
 import { pgUsers } from '../database/schema';
 import { ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { sql } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 
 @Controller('test')
 export class TestController {
@@ -12,11 +13,7 @@ export class TestController {
   constructor(
     @Inject('DB') private db: NodePgDatabase<typeof schema>
   ) {
-    this.logger.log('DB instance details:', {
-      isDefined: !!this.db,
-      hasQuery: !!this.db?.query,
-      methods: Object.keys(this.db || {})
-    });
+    this.logger.log('TestController initialized with DB injection');
   }
 
   @Get('/db-test')
@@ -29,15 +26,21 @@ export class TestController {
       const rawResult = await this.db.execute(sql`SELECT 1 as test`);
       this.logger.log('Raw query result:', rawResult);
 
+      // Generate a unique test email using timestamp
+      const timestamp = new Date().getTime();
+      const testEmail = `test_${timestamp}@example.com`;
+
       // Insert a test user
       const insertedUser = await this.db.insert(pgUsers).values({
-        email: 'test@example.com'
+        email: testEmail
       }).returning();
       this.logger.log('Inserted user:', insertedUser);
       
-      // Then try the pgUsers query
-      const result = await this.db.query.pgUsers.findFirst();
-      this.logger.log('pgUsers query result:', result);
+      // Get the latest user instead of just the first one
+      const result = await this.db.query.pgUsers.findFirst({
+        orderBy: (users, { desc }) => [desc(users.createdAt)]
+      });
+      this.logger.log('Latest user query result:', result);
       return { message: 'Database connection successful', data: result };
     } catch (error) {
       this.logger.error('Database error:', {
