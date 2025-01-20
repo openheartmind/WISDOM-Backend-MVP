@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SupabaseModule } from 'nestjs-supabase-js';
 import appConfig,{validate} from './config/app-config';
 import { AuthController } from './auth/auth.controller';
-import { DatabaseModule } from './database';
+import { DatabaseModule } from './database/database.module';
 import { TestController } from './test/test.controller';
 
 @Module({
