@@ -1,51 +1,48 @@
-import { Provider, Scope } from "@nestjs/common";
+import { Provider } from "@nestjs/common";
 import { drizzle as drizzlePg } from 'drizzle-orm/node-postgres';
 import { drizzle as drizzlePglite } from 'drizzle-orm/pglite';
 import { Pool } from 'pg';
 import { PGlite } from '@electric-sql/pglite';
 
 import * as schema from './schema';
+import * as testSchema from './schema/test'
 import { Database } from './database.types';
 import { ConfigService } from "@nestjs/config";
 import { EnvironmentVariables } from "src/config/app-config";
 
 export const databaseProvider = {
-    
-      provide: 'DB',
-      inject: [ConfigService],
-      useFactory: async (
-        configService: ConfigService<EnvironmentVariables>,
-      ): Promise<Database> => {
-        const env = configService.getOrThrow("NODE_ENV");
 
-        if (env === 'test') {
-          
-          const pgliteDB = new PGlite();
+  provide: 'DB',
+  inject: [ConfigService],
+  useFactory: async (
+    configService: ConfigService<EnvironmentVariables>,
+  ): Promise<Database> => {
+    const env = configService.getOrThrow("NODE_ENV");
 
-          return drizzlePglite(pgliteDB, { schema });
-        } else {
-         
-          const pool = new Pool({
-           connectionString: configService.getOrThrow("DATABASE_URL"),
-          });
+    if (env === 'test') {
+      const pgliteDB = new PGlite();
 
-          try {
-            const client = await pool.connect();
+      return drizzlePglite(pgliteDB, { schema: testSchema });
+    } else {
+      const pool = new Pool({
+        connectionString: configService.getOrThrow("DATABASE_URL"),
+      });
 
-            if (env === 'development') {
-              const result = await client.query(
-                'SELECT current_database() AS database, current_user AS user, version() AS version;',
-              );
-             
-            }
+      try {
+        const client = await pool.connect();
 
-            client.release();
-           
-            return drizzlePg(pool, { schema });
-          } catch (error) {
-            throw error;
-          }
+        if (env === 'development') {
+          const result = await client.query(
+            'SELECT current_database() AS database, current_user AS user, version() AS version;',
+          );
         }
-      },
-    
+
+        client.release();
+
+        return drizzlePg(pool, { schema });
+      } catch (error) {
+        throw error;
+      }
+    }
+  },
 } as Provider
