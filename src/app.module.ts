@@ -5,7 +5,7 @@ import { SupabaseModule } from 'nestjs-supabase-js';
 import appConfig,{validate} from './config/app-config';
 import { AuthController } from './auth/auth.controller';
 import { DatabaseModule } from './database/database.module';
-import { TestController } from './test/test.controller';
+
 
 @Module({
   imports: [
@@ -13,11 +13,9 @@ import { TestController } from './test/test.controller';
       isGlobal: true,
       validate: validate,
       load: [appConfig],
-      envFilePath: ['.env', `.env.${process.env.NODE_ENV}`],
-    }),
-    DatabaseModule,
+    })
   ],
-  controllers: [AuthController, TestController],
+  controllers: [AuthController],
+  providers: [],
 })
 export class AppModule {}
-
