@@ -7,13 +7,14 @@ import { PGlite } from '@electric-sql/pglite';
 import * as schema from './schema';
 import { Database } from './database.types';
 import { ConfigService } from "@nestjs/config";
+import { EnvironmentVariables } from "src/config/app-config";
 
 export const databaseProvider = {
     
       provide: 'DB',
       inject: [ConfigService],
       useFactory: async (
-        configService: ConfigService,
+        configService: ConfigService<EnvironmentVariables>,
       ): Promise<Database> => {
         const env = configService.getOrThrow("NODE_ENV");
 
@@ -25,12 +26,7 @@ export const databaseProvider = {
         } else {
          
           const pool = new Pool({
-            host: configService.get('DB_HOST'),
-            port: configService.get<number>('DB_PORT'),
-            database: configService.get('DB_NAME'),
-            user: configService.get('DB_USER'),
-            password: configService.get('DB_PASSWORD'),
-            ssl: env === 'production' ? { rejectUnauthorized: false } : false,
+           connectionString: configService.getOrThrow("DATABASE_URL"),
           });
 
           try {

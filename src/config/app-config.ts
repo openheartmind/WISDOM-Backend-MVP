@@ -10,7 +10,7 @@ enum Environment {
   Provision = "provision",
 }
 
-class EnvironmentVariables {
+export class EnvironmentVariables {
 
   @IsOptional()
   @IsNumber()
@@ -18,6 +18,13 @@ class EnvironmentVariables {
   @Max(65535)
   
   PORT: number;
+
+  @IsString()
+  NODE_ENV: "development" | "production" | "test" | "provision";
+
+  @IsOptional()
+  @IsUrl()
+  DATABASE_URL: string;
 
 }
 
@@ -38,6 +45,7 @@ export function validate(config: Record<string, unknown>) {
 export default () => ({
     PORT: parseInt(process.env.PORT, 10) || 3000,
     NODE_ENV: process.env.NODE_ENV || "development",
+    DATABASE_URL: process.env.DATABASE_URL,
     
 
 } as EnvironmentVariables);
