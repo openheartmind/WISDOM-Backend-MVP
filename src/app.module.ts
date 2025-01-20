@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 // import { validate } from 'class-validator';
-import { SupabaseModule } from 'nestjs-supabase-js';
-import appConfig,{validate} from './config/app-config';
+import appConfig, { validate } from './config/app-config';
 import { AuthController } from './auth/auth.controller';
 import { DatabaseModule } from './database/database.module';
 import { TestController } from './test/test.controller';
+import { InstanceController } from './instance/instance.controller';
 
 @Module({
   imports: [
@@ -17,7 +17,6 @@ import { TestController } from './test/test.controller';
     }),
     DatabaseModule,
   ],
-  controllers: [AuthController, TestController],
+  controllers: [AuthController, TestController, InstanceController],
 })
 export class AppModule {}
-
