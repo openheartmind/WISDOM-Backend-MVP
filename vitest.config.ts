@@ -1,4 +1,3 @@
-
 import swc from 'unplugin-swc';
 import { defineConfig } from 'vitest/config';
 
@@ -8,7 +7,8 @@ export default defineConfig({
     root: './',
     env:{
       NODE_ENV: 'test'
-    }
+    },
+   
   },
   plugins: [
     // This is required to build the test files with SWC

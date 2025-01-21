@@ -1,12 +1,14 @@
 import { Provider, Scope } from "@nestjs/common";
-import { drizzle as drizzlePg } from 'drizzle-orm/node-postgres';
+import { drizzle, drizzle as drizzlePg } from 'drizzle-orm/node-postgres';
 import { drizzle as drizzlePglite } from 'drizzle-orm/pglite';
+import {  } from 'drizzle-orm';
 import { Pool } from 'pg';
 import { PGlite } from '@electric-sql/pglite';
 
 import * as schema from './schema';
 import { Database } from './database.types';
 import { ConfigService } from "@nestjs/config";
+import { authUsers } from "drizzle-orm/supabase";
 import { EnvironmentVariables } from "src/config/app-config";
 
 export const databaseProvider = {
@@ -21,8 +23,10 @@ export const databaseProvider = {
         if (env === 'test') {
           
           const pgliteDB = new PGlite();
+          const drizzlePgliteDb = drizzlePglite(pgliteDB, { schema });
 
-          return drizzlePglite(pgliteDB, { schema });
+
+          return drizzlePgliteDb;
         } else {
          
           const pool = new Pool({
