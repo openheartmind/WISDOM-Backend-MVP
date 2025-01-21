@@ -1,7 +1,7 @@
 import { Controller, Get, Inject, Logger } from '@nestjs/common';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import * as schema from '../database/schema';
-import { pgUsers } from '../database/schema';
+import * as schema from '../database/schema/test';
+import { pgUsers } from '../database/schema/test';
 import { ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { sql } from 'drizzle-orm';
 import { desc } from 'drizzle-orm';
@@ -35,7 +35,7 @@ export class TestController {
         email: testEmail
       }).returning();
       this.logger.log('Inserted user:', insertedUser);
-      
+
       // Get the latest user instead of just the first one
       const result = await this.db.query.pgUsers.findFirst({
         orderBy: (users, { desc }) => [desc(users.createdAt)]
