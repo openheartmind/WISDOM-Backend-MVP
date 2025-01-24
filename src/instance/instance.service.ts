@@ -2,13 +2,12 @@ import { Injectable, Inject } from '@nestjs/common';
 import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
 import { pgInstances } from '../database/schema';
-import * as schema from '../database/schema';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { eq } from 'drizzle-orm';
+import { Database } from 'src/database/database.types';
 @Injectable()
 export class InstanceService {
-  db: NodePgDatabase<typeof schema>;
-  constructor(@Inject('DB') private database: NodePgDatabase<typeof schema>) {
+  db: Database;
+  constructor(@Inject('DB') private database: Database) {
     this.db = database;
   }
 
