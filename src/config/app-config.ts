@@ -23,7 +23,7 @@ export class EnvironmentVariables {
   NODE_ENV: "development" | "production" | "test" | "provision";
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   DATABASE_URL: string;
 
 }
