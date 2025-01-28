@@ -41,18 +41,18 @@ export class AuthService {
     email,
   }: VerifyOtpDto): Promise<VerifyOtpResponseDto> {
     const supabase = this.supabaseService.getClient();
-    // const { data, error } = await supabase.auth.verifyOtp({
-    //   email: email,
-    //   token: token,
-    //   type: 'email',
-    // });
-    // if (error) {
-    //   throw new BadRequestException({
-    //     message: 'Failed to verify OTP',
-    //     details: error.message,
-    //     status: error.status,
-    //   });
-    // }
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: email,
+      token: token,
+      type: 'email',
+    });
+    if (error) {
+      throw new BadRequestException({
+        message: 'Failed to verify OTP',
+        details: error.message,
+        status: error.status,
+      });
+    }
     let user = await this.databaseService.db.query.users.findFirst({
       where: eq(users.email, email),
     });
@@ -72,8 +72,8 @@ export class AuthService {
       }
     }
     return {
-      accessToken: "",
-      refreshToken: "",
+      accessToken: data.session.access_token,
+      refreshToken: data.session.refresh_token,
       user: user,
     };
   }

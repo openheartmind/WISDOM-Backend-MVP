@@ -10,7 +10,6 @@ import { Pool } from 'pg';
 import { PGlite } from '@electric-sql/pglite';
 
 import * as schema from './schema';
-import * as testSchema from './schema/test'
 import { ConfigService } from "@nestjs/config";
 import { EnvironmentVariables } from "src/config/app-config";
 
@@ -54,7 +53,7 @@ export class DatabaseService implements OnModuleInit {
       } catch (error) {
         console.error('Failed to initialize database connection:', error);
         throw new Error(`Database connection failed: ${error.message}`);
-      }
+      } 
     }
   }
 
