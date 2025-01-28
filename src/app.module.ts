@@ -5,7 +5,7 @@ import { SupabaseModule } from 'nestjs-supabase-js';
 import appConfig,{validate} from './config/app-config';
 import { AuthController } from './auth/auth.controller';
 import { DatabaseModule } from './database/database.module';
-import { TestController } from './test/test.controller';
+
 import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -19,7 +19,7 @@ import { AuthModule } from './auth/auth.module';
     DatabaseModule,
     AuthModule,
   ],
-  controllers: [TestController],
+  controllers: [],
 })
 export class AppModule {}
 

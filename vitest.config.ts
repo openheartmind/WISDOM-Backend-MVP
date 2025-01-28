@@ -8,7 +8,7 @@ export default defineConfig({
     env:{
       NODE_ENV: 'test'
     },
-   
+    setupFiles:['./test/setup.ts']
   },
   plugins: [
     // This is required to build the test files with SWC

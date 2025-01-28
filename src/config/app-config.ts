@@ -23,8 +23,16 @@ export class EnvironmentVariables {
   NODE_ENV: "development" | "production" | "test" | "provision";
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   DATABASE_URL: string;
+
+ 
+  @IsString()
+  SUPABASE_URL: string;
+
+ 
+  @IsString()
+  SUPABASE_KEY: string;
 
 }
 
@@ -46,7 +54,8 @@ export default () => ({
     PORT: parseInt(process.env.PORT, 10) || 3000,
     NODE_ENV: process.env.NODE_ENV || "development",
     DATABASE_URL: process.env.DATABASE_URL,
-    
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_KEY: process.env.SUPABASE_KEY,
 
 } as EnvironmentVariables);
   

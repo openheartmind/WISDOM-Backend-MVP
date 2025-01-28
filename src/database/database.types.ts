@@ -5,4 +5,4 @@ import * as testSchema from './schema/test'
 
 export type Database = 
   | NodePgDatabase<typeof schema>
-  | PgliteDatabase<typeof testSchema>;
+  | PgliteDatabase<typeof schema>;
