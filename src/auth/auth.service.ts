@@ -19,7 +19,7 @@ export class AuthService {
       email: signInDto.email,
       
     })
-    console.log({data},error)
+   
     if(error){
       throw new BadRequestException({
         message: 'Failed to send OTP',
