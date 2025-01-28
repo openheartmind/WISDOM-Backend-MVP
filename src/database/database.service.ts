@@ -49,7 +49,6 @@ export class DatabaseService implements OnModuleInit {
           console.log('Database connection info:', result.rows[0]);
         }
 
-        client.release();
 
         this.db = drizzlePg(pool, { schema });
       } catch (error) {
