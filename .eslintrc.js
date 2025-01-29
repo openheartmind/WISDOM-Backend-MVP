@@ -7,12 +7,18 @@ module.exports = {
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:react/recommended',
     'plugin:prettier/recommended',
+    'prettier/@typescript-eslint',
   ],
   root: true,
   env: {
     node: true,
+    browser: true,
+    es6: true,
     jest: true,
   },
   ignorePatterns: ['.eslintrc.js'],
