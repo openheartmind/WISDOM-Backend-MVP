@@ -4,7 +4,6 @@ import {
   AuthenticateResponseDto,
 } from './dto/authenticate.dto';
 import { SupabaseService } from 'src/supabase/supabase.service';
-
 import { DatabaseService } from 'src/database/database.service';
 import { eq } from 'drizzle-orm';
 import { users } from 'src/database/schema';
@@ -15,7 +14,8 @@ export class AuthService {
   constructor(
     private supabaseService: SupabaseService,
     private databaseService: DatabaseService,
-  ) {}
+  ) { }
+
   async signInWithEmailOtp(
     signInDto: AuthenticateDto,
   ): Promise<AuthenticateResponseDto> {
@@ -36,6 +36,7 @@ export class AuthService {
       success: true,
     };
   }
+
   async verifyEmailOtp({
     token,
     email,
@@ -57,13 +58,13 @@ export class AuthService {
       where: eq(users.email, email),
     });
     if (!user) {
-      user = await this.databaseService.db
+      user = (await this.databaseService.db
         .insert(users)
         .values({
           email: email,
         })
-        .returning().execute()[0];
-      if(!user){
+        .returning().execute())[0];
+      if (!user) {
         throw new BadRequestException({
           message: 'Failed to create user',
           details: 'Failed to create user',
