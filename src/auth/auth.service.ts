@@ -14,7 +14,7 @@ export class AuthService {
   constructor(
     private supabaseService: SupabaseService,
     private databaseService: DatabaseService,
-  ) { }
+  ) {}
 
   async signInWithEmailOtp(
     signInDto: AuthenticateDto,
@@ -58,17 +58,20 @@ export class AuthService {
       where: eq(users.email, email),
     });
     if (!user) {
-      user = (await this.databaseService.db
-        .insert(users)
-        .values({
-          email: email,
-        })
-        .returning().execute())[0];
+      user = (
+        await this.databaseService.db
+          .insert(users)
+          .values({
+            email: email,
+          })
+          .returning()
+          .execute()
+      )[0];
       if (!user) {
         throw new BadRequestException({
           message: 'Failed to create user',
           details: 'Failed to create user',
-          status: HttpStatus.BAD_REQUEST
+          status: HttpStatus.BAD_REQUEST,
         });
       }
     }

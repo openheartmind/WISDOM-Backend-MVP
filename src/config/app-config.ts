@@ -1,5 +1,13 @@
 import { plainToInstance } from 'class-transformer';
-import { IsNumber, IsOptional, IsString, IsUrl, Max, Min, validateSync, } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Max,
+  Min,
+  validateSync,
+} from 'class-validator';
 
 export class EnvironmentVariables {
   @IsOptional()
@@ -10,7 +18,7 @@ export class EnvironmentVariables {
 
   @IsOptional()
   @IsString()
-  NODE_ENV: "development" | "production" | "test" | "provision";
+  NODE_ENV: 'development' | 'production' | 'test' | 'provision';
 
   @IsString()
   DATABASE_URL: string;
@@ -23,12 +31,12 @@ export class EnvironmentVariables {
 }
 
 export function validate(config: Record<string, unknown>) {
-  const validatedConfig = plainToInstance(
-    EnvironmentVariables,
-    config,
-    { enableImplicitConversion: true },
-  );
-  const errors = validateSync(validatedConfig, { skipMissingProperties: false });
+  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+    enableImplicitConversion: true,
+  });
+  const errors = validateSync(validatedConfig, {
+    skipMissingProperties: false,
+  });
 
   if (errors.length > 0) {
     throw new Error(errors.toString());
@@ -36,11 +44,11 @@ export function validate(config: Record<string, unknown>) {
   return validatedConfig;
 }
 
-export default () => ({
-  PORT: parseInt(process.env.PORT, 10) || 3000,
-  NODE_ENV: process.env.NODE_ENV || "development",
-  DATABASE_URL: process.env.DATABASE_URL,
-  SUPABASE_URL: process.env.SUPABASE_URL,
-  SUPABASE_KEY: process.env.SUPABASE_KEY,
-
-} as EnvironmentVariables);
+export default () =>
+  ({
+    PORT: parseInt(process.env.PORT, 10) || 3000,
+    NODE_ENV: process.env.NODE_ENV || 'development',
+    DATABASE_URL: process.env.DATABASE_URL,
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_KEY: process.env.SUPABASE_KEY,
+  }) as EnvironmentVariables;

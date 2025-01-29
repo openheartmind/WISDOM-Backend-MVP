@@ -1,11 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-// import { validate } from 'class-validator';
-import { SupabaseModule } from 'nestjs-supabase-js';
-import appConfig,{validate} from './config/app-config';
-import { AuthController } from './auth/auth.controller';
+import { ConfigModule } from '@nestjs/config';
+import appConfig, { validate } from './config/app-config';
 import { DatabaseModule } from './database/database.module';
-
 import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -22,4 +18,3 @@ import { AuthModule } from './auth/auth.module';
   controllers: [],
 })
 export class AppModule {}
-

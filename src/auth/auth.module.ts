@@ -5,7 +5,7 @@ import { DatabaseModule } from 'src/database/database.module';
 import { SupabaseModule } from 'src/supabase/supabase.module';
 
 @Module({
-  imports: [DatabaseModule,SupabaseModule],
+  imports: [DatabaseModule, SupabaseModule],
   controllers: [AuthController],
   providers: [AuthService],
   exports: [AuthService],
