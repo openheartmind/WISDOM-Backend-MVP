@@ -21,7 +21,7 @@ export class AuthService {
   ): Promise<AuthenticateResponseDto> {
     const supabase = this.supabaseService.getClient();
 
-    const { data, error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithOtp({
       email: signInDto.email,
     });
 
