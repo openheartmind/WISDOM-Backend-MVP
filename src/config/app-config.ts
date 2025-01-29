@@ -1,39 +1,25 @@
-
-
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString, IsUrl, Max, Min, validateSync, } from 'class-validator';
-
-enum Environment {
-  Development = "development",
-  Production = "production",
-  Test = "test",
-  Provision = "provision",
-}
+import { IsNumber, IsOptional, IsString, IsUrl, Max, Min, validateSync, } from 'class-validator';
 
 export class EnvironmentVariables {
-
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(65535)
-  
   PORT: number;
-
-  @IsString()
-  NODE_ENV: "development" | "production" | "test" | "provision";
 
   @IsOptional()
   @IsString()
+  NODE_ENV: "development" | "production" | "test" | "provision";
+
+  @IsString()
   DATABASE_URL: string;
 
- 
-  @IsString()
+  @IsUrl()
   SUPABASE_URL: string;
 
- 
   @IsString()
   SUPABASE_KEY: string;
-
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -51,11 +37,10 @@ export function validate(config: Record<string, unknown>) {
 }
 
 export default () => ({
-    PORT: parseInt(process.env.PORT, 10) || 3000,
-    NODE_ENV: process.env.NODE_ENV || "development",
-    DATABASE_URL: process.env.DATABASE_URL,
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_KEY: process.env.SUPABASE_KEY,
+  PORT: parseInt(process.env.PORT, 10) || 3000,
+  NODE_ENV: process.env.NODE_ENV || "development",
+  DATABASE_URL: process.env.DATABASE_URL,
+  SUPABASE_URL: process.env.SUPABASE_URL,
+  SUPABASE_KEY: process.env.SUPABASE_KEY,
 
 } as EnvironmentVariables);
-  
