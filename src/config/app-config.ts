@@ -1,29 +1,25 @@
 import { plainToInstance } from 'class-transformer';
 import {
-  IsNumber,
   IsOptional,
+  IsPort,
   IsString,
   IsUrl,
-  Max,
-  Min,
   validateSync,
 } from 'class-validator';
 
 export class EnvironmentVariables {
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  @Max(65535)
-  PORT: number;
+  @IsPort()
+  PORT: number | string;
 
   @IsOptional()
   @IsString()
   NODE_ENV: 'development' | 'production' | 'test' | 'provision';
 
-  @IsString()
+  @IsUrl({ protocols: ['postgres', 'postgresql'], require_protocol: true, require_tld: false })
   DATABASE_URL: string;
 
-  @IsUrl()
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true, require_tld: false })
   SUPABASE_URL: string;
 
   @IsString()
@@ -46,7 +42,7 @@ export function validate(config: Record<string, unknown>) {
 
 export default () =>
   ({
-    PORT: parseInt(process.env.PORT, 10) || 3000,
+    PORT: process.env.PORT || 3000,
     NODE_ENV: process.env.NODE_ENV || 'development',
     DATABASE_URL: process.env.DATABASE_URL,
     SUPABASE_URL: process.env.SUPABASE_URL,
