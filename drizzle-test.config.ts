@@ -1,11 +1,11 @@
 import type { Config } from 'drizzle-kit';
 
 export default {
-  schema: './src/database/schema/test/index.ts',
-  out: './drizzle-test',
+  schema: './src/database/schema/index.ts',
+  out: './drizzle',
   dialect: 'postgresql',
   driver: 'pglite',
   dbCredentials: {
-    url: './drizzle-test/database',
+    url: 'memory://',
   }
 } satisfies Config;
