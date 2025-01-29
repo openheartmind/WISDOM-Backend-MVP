@@ -72,8 +72,8 @@ export class AuthService {
       }
     }
     return {
-      accessToken: data.session.access_token,
-      refreshToken: data.session.refresh_token,
+      accessToken: data.session!.access_token,
+      refreshToken: data.session!.refresh_token,
       user: user,
     };
   }

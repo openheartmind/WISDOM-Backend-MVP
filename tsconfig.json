@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "module": "esnext",
+    "module": "commonjs",
     "target": "esnext",
     "outDir": "./dist",
     "baseUrl": "./",
@@ -14,7 +14,9 @@
     "strict": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
-    "noUnusedLocals": true,
+    "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": false,
+    "noUnusedLocals": false,
     "importHelpers": true,
     "incremental": true,
     "skipLibCheck": true,

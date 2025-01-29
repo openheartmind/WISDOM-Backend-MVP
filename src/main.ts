@@ -21,7 +21,7 @@ async function bootstrap() {
   .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/docs', app, documentFactory);
-  await app.listen(configService.get("PORT"));
+  await app.listen(configService.get("PORT") as number);
   //Provide the ipv4 address of the server
   logger.log(`Listening on ${await app.getUrl()}`);
 }
