@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { beforeAll, afterAll } from 'vitest';
+import { beforeAll } from 'vitest';
 
 beforeAll(async () => {
   // Run migrations before all tests
@@ -12,5 +12,3 @@ beforeAll(async () => {
     throw error;
   }
 });
-
-

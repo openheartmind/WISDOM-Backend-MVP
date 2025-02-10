@@ -4,7 +4,6 @@ import {
   AuthenticateResponseDto,
 } from './dto/authenticate.dto';
 import { SupabaseService } from 'src/supabase/supabase.service';
-
 import { DatabaseService } from 'src/database/database.service';
 import { eq } from 'drizzle-orm';
 import { users } from 'src/database/schema';

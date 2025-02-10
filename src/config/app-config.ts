@@ -1,48 +1,38 @@
-
-
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString, IsUrl, Max, Min, validateSync, } from 'class-validator';
-
-enum Environment {
-  Development = "development",
-  Production = "production",
-  Test = "test",
-  Provision = "provision",
-}
+import {
+  IsOptional,
+  IsPort,
+  IsString,
+  IsUrl,
+  validateSync,
+} from 'class-validator';
 
 export class EnvironmentVariables {
-
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  @Max(65535)
-  
-  PORT: number;
-
-  @IsString()
-  NODE_ENV: "development" | "production" | "test" | "provision";
+  @IsPort()
+  PORT: number | string;
 
   @IsOptional()
   @IsString()
+  NODE_ENV: 'development' | 'production' | 'test' | 'provision';
+
+  @IsUrl({ protocols: ['postgres', 'postgresql'], require_protocol: true, require_tld: false })
   DATABASE_URL: string;
 
- 
-  @IsString()
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true, require_tld: false })
   SUPABASE_URL: string;
 
- 
   @IsString()
   SUPABASE_KEY: string;
-
 }
 
 export function validate(config: Record<string, unknown>) {
-  const validatedConfig = plainToInstance(
-    EnvironmentVariables,
-    config,
-    { enableImplicitConversion: true },
-  );
-  const errors = validateSync(validatedConfig, { skipMissingProperties: false });
+  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+    enableImplicitConversion: true,
+  });
+  const errors = validateSync(validatedConfig, {
+    skipMissingProperties: false,
+  });
 
   if (errors.length > 0) {
     throw new Error(errors.toString());
@@ -56,6 +46,4 @@ export default () => ({
     DATABASE_URL: process.env.DATABASE_URL,
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_KEY: process.env.SUPABASE_KEY,
-
-} as EnvironmentVariables);
-  
+  }) as EnvironmentVariables;

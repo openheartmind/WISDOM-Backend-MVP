@@ -1,5 +1,4 @@
-import { sql } from 'drizzle-orm';
-import { pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 // Postgres schema (for dev and prod)
 export const users = pgTable('users', {
