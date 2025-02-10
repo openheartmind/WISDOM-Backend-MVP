@@ -9,6 +9,8 @@ import { DatabaseService } from 'src/database/database.service';
 import { eq } from 'drizzle-orm';
 import { users } from 'src/database/schema';
 import { VerifyOtpDto, VerifyOtpResponseDto } from './dto/verify-otp.dto';
+import { SignUpDto, SignUpResponseDto } from './dto/sign-up.dto';
+import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,65 +18,82 @@ export class AuthService {
     private supabaseService: SupabaseService,
     private databaseService: DatabaseService,
   ) {}
-  async signInWithEmailOtp(
-    signInDto: AuthenticateDto,
-  ): Promise<AuthenticateResponseDto> {
+
+  async signIn(signInDto: SignInDto): Promise<SignInResponseDto> {
     const supabase = this.supabaseService.getClient();
-
-    const { data, error } = await supabase.auth.signInWithOtp({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: signInDto.email,
+      password: signInDto.password,
     });
-
-    if (error) {
+  
+    
+    if(!data?.session?.access_token){
       throw new BadRequestException({
-        message: 'Failed to send OTP',
+        message: 'Failed to sign in',
+        details: 'Invalid credentials',
+        status: HttpStatus.UNAUTHORIZED,
+      })
+    }
+
+    if (error ) {
+      throw new BadRequestException({
+        message: 'Failed to sign in',
         details: error.message,
         status: error.status,
       });
+    }
+    const user = await this.databaseService.db.query.users.findFirst({
+      where:eq(users.authId,data.user.id)
+    })
+    if(!user){
+      throw new BadRequestException({
+        message: 'Failed to sign in',
+        details: 'User not found',
+        status: HttpStatus.UNAUTHORIZED,
+      })
     }
     return {
       success: true,
+      accessToken: data.session.access_token,
+      user:user
     };
   }
-  async verifyEmailOtp({
-    token,
-    email,
-  }: VerifyOtpDto): Promise<VerifyOtpResponseDto> {
+  async signUp(signUpDto: SignUpDto): Promise<SignUpResponseDto> {
     const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase.auth.verifyOtp({
-      email: email,
-      token: token,
-      type: 'email',
+
+    
+    
+    const { data, error } = await supabase.auth.signUp({
+      email: signUpDto.email,
+      password: signUpDto.password,
     });
+    if(data?.user?.id){
+      await this.databaseService.db.insert(users).values({
+        email: signUpDto.email,
+        username: signUpDto.username,
+        name: signUpDto.fullName,
+        authId: data.user?.id,
+      })
+    }
+   
     if (error) {
       throw new BadRequestException({
-        message: 'Failed to verify OTP',
+        message: 'Failed to sign up',
         details: error.message,
         status: error.status,
       });
     }
-    let user = await this.databaseService.db.query.users.findFirst({
-      where: eq(users.email, email),
-    });
-    if (!user) {
-      user = await this.databaseService.db
-        .insert(users)
-        .values({
-          email: email,
-        })
-        .returning().execute()[0];
-      if(!user){
-        throw new BadRequestException({
-          message: 'Failed to create user',
-          details: 'Failed to create user',
-          status: HttpStatus.BAD_REQUEST
-        });
-      }
-    }
+
     return {
-      accessToken: data.session!.access_token,
-      refreshToken: data.session!.refresh_token,
-      user: user,
+      success: true
+    }
+  }
+  async verifyEmailWithMagicLink(
+    signInDto: AuthenticateDto,
+  ): Promise<AuthenticateResponseDto> {
+    
+    return {
+      success: true,
     };
   }
 }

@@ -3,25 +3,29 @@ import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthenticateDto, AuthenticateResponseDto } from './dto/authenticate.dto';
 import { AuthService } from './auth.service';
 import { VerifyOtpDto, VerifyOtpResponseDto } from './dto/verify-otp.dto';
+import { SignUpDto, SignUpResponseDto } from './dto/sign-up.dto';
+import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
 
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
-    @Post('/sign-in')
-    @ApiOperation({ summary: 'Sign In and if user does not exist, create a new user' })
+    @Post('/sign-up')
+    @ApiOperation({ summary: 'Sign up user using email and password' })
     @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
     @ApiResponse({ status: HttpStatus.OK,type: AuthenticateResponseDto})
-    @ApiBody({ type: AuthenticateDto })
-    async authenticate(@Body() signUpDto: AuthenticateDto): Promise<AuthenticateResponseDto> {
-       return await this.authService.signInWithEmailOtp(signUpDto);
+    @ApiBody({ type: SignUpDto })
+    async signUp(@Body() signUpDto: SignUpDto): Promise<SignUpResponseDto> {
+       return await this.authService.signUp(signUpDto);
     }
 
-    @Post('/verify-otp')
-    @ApiOperation({ summary: 'Verify OTP' })
-    @ApiResponse({ status: HttpStatus.OK,type: VerifyOtpResponseDto})
-    @ApiBody({ type: VerifyOtpDto })
-    async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto): Promise<VerifyOtpResponseDto> {
-       return await this.authService.verifyEmailOtp(verifyOtpDto);
+
+    @Post('/sign-in')
+    @ApiOperation({ summary: 'Sign in user using email and password' })
+    @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+    @ApiResponse({ status: HttpStatus.OK,type: AuthenticateResponseDto})
+    @ApiBody({ type: SignInDto })
+    async signIn(@Body() signInDto: SignInDto): Promise<SignInResponseDto> {
+       return await this.authService.signIn(signInDto);
     }
 }
