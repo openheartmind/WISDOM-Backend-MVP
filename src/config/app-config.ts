@@ -24,6 +24,9 @@ export class EnvironmentVariables {
 
   @IsString()
   SUPABASE_KEY: string;
+
+  @IsString()
+  SUPABASE_SERVICE_KEY: string;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -41,9 +44,10 @@ export function validate(config: Record<string, unknown>) {
 }
 
 export default () => ({
-    PORT: parseInt(process.env.PORT as string, 10) || 3000,
-    NODE_ENV: process.env.NODE_ENV || "development",
-    DATABASE_URL: process.env.DATABASE_URL,
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_KEY: process.env.SUPABASE_KEY,
-  }) as EnvironmentVariables;
+  PORT: parseInt(process.env.PORT as string, 10) || 3000,
+  NODE_ENV: process.env.NODE_ENV || "development",
+  DATABASE_URL: process.env.DATABASE_URL,
+  SUPABASE_URL: process.env.SUPABASE_URL,
+  SUPABASE_KEY: process.env.SUPABASE_KEY,
+  SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
+}) as EnvironmentVariables;
