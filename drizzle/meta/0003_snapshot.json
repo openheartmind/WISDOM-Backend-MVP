@@ -1,6 +1,6 @@
 {
-  "id": "e11ee02f-21a3-403a-9275-18b902772233",
-  "prevId": "73c7ffac-1853-4617-9700-113fdbc0a8ba",
+  "id": "a2c64230-8d1f-4beb-86b8-9574cee749fa",
+  "prevId": "e11ee02f-21a3-403a-9275-18b902772233",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -8,8 +8,8 @@
       "name": "users",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
+        "authId": {
+          "name": "authId",
           "type": "text",
           "primaryKey": true,
           "notNull": true
