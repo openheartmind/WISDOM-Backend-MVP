@@ -5,20 +5,15 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
-  Inject,
+  Delete
 } from '@nestjs/common';
 import { InstanceService } from './instance.service';
-import * as schema from '../database/schema';
 import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 @Controller('instance')
 export class InstanceController {
-  instanceService: InstanceService;
-  constructor(@Inject('DB') private db: NodePgDatabase<typeof schema>) {
-    this.instanceService = new InstanceService(db);
+  constructor(private readonly instanceService: InstanceService) {
   }
 
   @Post()
