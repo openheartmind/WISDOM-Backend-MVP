@@ -32,7 +32,9 @@
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.3",
+    "email-templates": "^12.0.1",
     "nestjs-supabase-js": "^1.1.0",
+    "nunjucks": "^3.2.4",
     "pg": "^8.13.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
@@ -42,6 +44,7 @@
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
     "@swc/core": "^1.10.8",
+    "@types/email-templates": "^10.0.4",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",

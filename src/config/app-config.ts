@@ -1,7 +1,5 @@
-
-
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString, IsUrl, Max, Min, validateSync, } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsPort, IsString, IsUrl, Max, Min, validateSync, } from 'class-validator';
 
 enum Environment {
   Development = "development",
@@ -16,16 +14,32 @@ export class EnvironmentVariables {
   @IsNumber()
   @Min(0)
   @Max(65535)
-  
   PORT: number;
 
   @IsString()
   NODE_ENV: "development" | "production" | "test" | "provision";
 
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ protocols: ['postgres', 'postgresql'], require_protocol: true, require_tld: false })
   DATABASE_URL: string;
 
+  @IsString()
+  SMTP_USER: string;
+
+  @IsString()
+  SMTP_PASS: string;
+
+  @IsOptional()
+  @IsString()
+  SMTP_HOST: string;
+
+  @IsOptional()
+  @IsPort()
+  SMTP_PORT: number | string;
+
+  @IsOptional()
+  @IsBoolean()
+  SMTP_TLS: boolean;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -43,10 +57,12 @@ export function validate(config: Record<string, unknown>) {
 }
 
 export default () => ({
-    PORT: parseInt(process.env.PORT, 10) || 3000,
-    NODE_ENV: process.env.NODE_ENV || "development",
-    DATABASE_URL: process.env.DATABASE_URL,
-    
-
+  PORT: parseInt(process.env.PORT, 10) || 3000,
+  NODE_ENV: process.env.NODE_ENV || "development",
+  DATABASE_URL: process.env.DATABASE_URL,
+  SMTP_USER: process.env.SMTP_USER,
+  SMTP_PASS: process.env.SMTP_PASS,
+  SMTP_HOST: process.env.SMTP_HOST || 'localhost',
+  SMTP_PORT: process.env.SMTP_PORT || 25,
+  SMTP_TLS: process.env.SMTP_TLS ? process.env.SMTP_TLS.trim().toLowerCase() === 'true' : false
 } as EnvironmentVariables);
-  
