@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { EnvironmentVariables } from "src/config/app-config";
 import Email from 'email-templates';
+import type { SentMessageInfo } from "nodemailer/lib/smtp-connection";
 
 @Injectable()
 export class MailerService {
@@ -17,7 +18,7 @@ export class MailerService {
     this.mailer = new Email({
       transport: {
         host,
-        port: port ? parseInt(port.toString(), 10): undefined,
+        port: port ? parseInt(port.toString(), 10) : undefined,
         secure,
         auth: {
           user,
@@ -40,6 +41,7 @@ export class MailerService {
   }
 
   async send(options: Email.EmailOptions) {
-    await this.mailer.send(options);
+    const messageInfo = (await this.mailer.send(options)) as SentMessageInfo;
+    return messageInfo;
   }
 }

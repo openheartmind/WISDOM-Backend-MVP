@@ -25,17 +25,24 @@ describe('MailerService', () => {
 
   describe('send', () => {
     it('can send mail with a template', async () => {
-      // const mailer = mailerService.getMailer();
-      await mailerService.send({
+      const recepient = 'email@example.com';
+      const msgInfo = await mailerService.send({
+        // our template is provided as an absolute path to ./test/hello
         template: path.join(__dirname, 'test', 'hello'),
         message: {
-          to: 'email@example.com',
-          from: 'Tester <test@example.com>'
+          to: recepient,
+          from: 'Tester <test@example.com>',
+          // subject: 'included in template'
+          // html: 'included in template',
+          // text: 'extracted from html'
         },
         locals: {
           name: 'Test User'
         }
       });
+
+      // console.log(msgInfo);
+      expect(msgInfo.accepted).toContain(recepient);
     });
   });
 });
