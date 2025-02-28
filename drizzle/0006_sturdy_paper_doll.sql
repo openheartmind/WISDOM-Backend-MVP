@@ -1,0 +1,1 @@
+ALTER TABLE "instances" ADD CONSTRAINT "instances_created_by_users_authId_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("authId") ON DELETE no action ON UPDATE no action;
