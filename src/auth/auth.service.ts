@@ -101,7 +101,7 @@ export class AuthService {
     await this.databaseService.db.insert(users).values({
       email: signUpDto.email,
       displayName: signUpDto.displayName,
-       
+      
       authId: authData.user.id,
     })
 
