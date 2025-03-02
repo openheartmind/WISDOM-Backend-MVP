@@ -36,6 +36,13 @@
       "when": 1740911840501,
       "tag": "0004_tricky_stellaris",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1740912495401,
+      "tag": "0005_lowly_tarot",
+      "breakpoints": true
     }
   ]
 }

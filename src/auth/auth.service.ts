@@ -100,8 +100,8 @@ export class AuthService {
     // now that authUser has been created and an email has been sent, create our users entry
     await this.databaseService.db.insert(users).values({
       email: signUpDto.email,
-      username: signUpDto.username,
-      name: signUpDto.fullName,
+      displayName: signUpDto.displayName,
+       
       authId: authData.user.id,
     })
 
