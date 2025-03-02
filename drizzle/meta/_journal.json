@@ -29,6 +29,13 @@
       "when": 1739183689277,
       "tag": "0003_outgoing_pride",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1740911840501,
+      "tag": "0004_tricky_stellaris",
+      "breakpoints": true
     }
   ]
 }
