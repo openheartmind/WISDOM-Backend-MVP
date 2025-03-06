@@ -1,1 +1,0 @@
-ALTER TABLE "instances" ADD COLUMN "created_by" text;
