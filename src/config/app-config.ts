@@ -40,6 +40,10 @@ export class EnvironmentVariables {
   @IsOptional()
   @IsBoolean()
   SMTP_TLS: boolean;
+
+  @IsOptional()
+  @IsString()
+  SMTP_FROM: string;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -64,5 +68,6 @@ export default () => ({
   SMTP_PASS: process.env.SMTP_PASS,
   SMTP_HOST: process.env.SMTP_HOST || 'localhost',
   SMTP_PORT: process.env.SMTP_PORT || 25,
-  SMTP_TLS: process.env.SMTP_TLS ? process.env.SMTP_TLS.trim().toLowerCase() === 'true' : false
+  SMTP_TLS: process.env.SMTP_TLS ? process.env.SMTP_TLS.trim().toLowerCase() === 'true' : false,
+  SMTP_FROM: process.env.SMTP_FROM || 'test@example.com'
 } as EnvironmentVariables);
