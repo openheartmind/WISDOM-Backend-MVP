@@ -31,7 +31,6 @@ describe('MailerService', () => {
         template: path.join(__dirname, 'test', 'hello'),
         message: {
           to: recepient,
-          from: 'Tester <test@example.com>',
           // subject: 'included in template'
           // html: 'included in template',
           // text: 'extracted from html'
