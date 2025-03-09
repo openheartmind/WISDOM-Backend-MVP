@@ -15,6 +15,7 @@ async function bootstrap() {
     .setDescription('OHM BACKEND')
     .setVersion('1.0')
     .addTag('production')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/docs', app, documentFactory);
