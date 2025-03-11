@@ -1,5 +1,5 @@
 {
-  "id": "83b7da6a-da3d-4fd6-bfd0-e73de262fcc3",
+  "id": "6bae87b0-cfc2-4a54-b69b-7d85c84fcf45",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -8,9 +8,9 @@
       "name": "users",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
+        "authId": {
+          "name": "authId",
+          "type": "text",
           "primaryKey": true,
           "notNull": true
         },
@@ -20,8 +20,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "display_name": {
+          "name": "display_name",
           "type": "text",
           "primaryKey": false,
           "notNull": false

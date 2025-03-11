@@ -1,27 +1,36 @@
 import { plainToInstance } from 'class-transformer';
-import { IsBoolean, IsEnum, IsNumber, IsOptional, IsPort, IsString, IsUrl, Max, Min, validateSync, } from 'class-validator';
-
-enum Environment {
-  Development = "development",
-  Production = "production",
-  Test = "test",
-  Provision = "provision",
-}
+import {
+  IsBoolean,
+  IsOptional,
+  IsPort,
+  IsString,
+  IsUrl,
+  validateSync,
+} from 'class-validator';
 
 export class EnvironmentVariables {
+  @IsOptional()
+  @IsPort()
+  PORT: number | string;
 
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  @Max(65535)
-  PORT: number;
+  @IsString()
+  NODE_ENV: 'development' | 'production' | 'test' | 'provision';
+
+  @IsUrl({ protocols: ['postgres', 'postgresql'], require_protocol: true, require_tld: false }{ protocols: ['postgres', 'postgresql'], require_protocol: true, require_tld: false })
+  DATABASE_URL: string;
+
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true, require_tld: false })
+  SUPABASE_URL: string;
 
   @IsString()
-  NODE_ENV: "development" | "production" | "test" | "provision";
+  SUPABASE_KEY: string;
 
-  @IsOptional()
-  @IsUrl({ protocols: ['postgres', 'postgresql'], require_protocol: true, require_tld: false })
-  DATABASE_URL: string;
+  @IsString()
+  SUPABASE_SERVICE_KEY: string;
+
+  @IsString()
+  JWT_SECRET: string;
 
   @IsString()
   SMTP_USER: string;
@@ -47,12 +56,12 @@ export class EnvironmentVariables {
 }
 
 export function validate(config: Record<string, unknown>) {
-  const validatedConfig = plainToInstance(
-    EnvironmentVariables,
-    config,
-    { enableImplicitConversion: true },
-  );
-  const errors = validateSync(validatedConfig, { skipMissingProperties: false });
+  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+    enableImplicitConversion: true,
+  });
+  const errors = validateSync(validatedConfig, {
+    skipMissingProperties: false,
+  });
 
   if (errors.length > 0) {
     throw new Error(errors.toString());
@@ -61,13 +70,17 @@ export function validate(config: Record<string, unknown>) {
 }
 
 export default () => ({
-  PORT: parseInt(process.env.PORT, 10) || 3000,
+  PORT: parseInt(process.env.PORT as string, 10) || 3000,
   NODE_ENV: process.env.NODE_ENV || "development",
   DATABASE_URL: process.env.DATABASE_URL,
+  SUPABASE_URL: process.env.SUPABASE_URL,
+  SUPABASE_KEY: process.env.SUPABASE_KEY,
+  SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
+  JWT_SECRET: process.env.JWT_SECRET,
   SMTP_USER: process.env.SMTP_USER,
   SMTP_PASS: process.env.SMTP_PASS,
   SMTP_HOST: process.env.SMTP_HOST || 'localhost',
   SMTP_PORT: process.env.SMTP_PORT || 25,
   SMTP_TLS: process.env.SMTP_TLS ? process.env.SMTP_TLS.trim().toLowerCase() === 'true' : false,
   SMTP_FROM: process.env.SMTP_FROM || 'test@example.com'
-} as EnvironmentVariables);
+}) as EnvironmentVariables;
