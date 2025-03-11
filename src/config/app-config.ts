@@ -17,7 +17,7 @@ export class EnvironmentVariables {
   @IsString()
   NODE_ENV: 'development' | 'production' | 'test' | 'provision';
 
-  @IsUrl({ protocols: ['postgres', 'postgresql'], require_protocol: true, require_tld: false }{ protocols: ['postgres', 'postgresql'], require_protocol: true, require_tld: false })
+  @IsUrl({ protocols: ['postgres', 'postgresql'], require_protocol: true, require_tld: false })
   DATABASE_URL: string;
 
   @IsUrl({ protocols: ['http', 'https'], require_protocol: true, require_tld: false })
