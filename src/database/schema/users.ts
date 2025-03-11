@@ -1,14 +1,10 @@
-import { sql } from 'drizzle-orm';
-import { pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 // Postgres schema (for dev and prod)
-export const pgUsers = pgTable('users', {
-  id: serial('id').primaryKey(),
+export const users = pgTable('users', {
+  authId: text('authId').primaryKey(),
   email: text('email').notNull().unique(),
-  name: text('name'),
+  displayName: text('display_name'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
-
-// Export the appropriate schema based on environment
-export const users = pgUsers;
