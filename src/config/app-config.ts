@@ -27,6 +27,9 @@ export class EnvironmentVariables {
 
   @IsString()
   SUPABASE_SERVICE_KEY: string;
+
+  @IsString()
+  JWT_SECRET: string;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -50,4 +53,5 @@ export default () => ({
   SUPABASE_URL: process.env.SUPABASE_URL,
   SUPABASE_KEY: process.env.SUPABASE_KEY,
   SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
+  JWT_SECRET: process.env.JWT_SECRET,
 }) as EnvironmentVariables;

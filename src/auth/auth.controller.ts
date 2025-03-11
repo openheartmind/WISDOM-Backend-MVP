@@ -1,5 +1,5 @@
-import { Body, Controller, HttpStatus, Post, Get, Query } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { Body, Controller, HttpStatus, Post, Get, Query, UseGuards } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import {
   AuthenticateDto,
   AuthenticateResponseDto,
@@ -8,6 +8,9 @@ import { AuthService } from './auth.service';
 import { VerifyOtpDto, VerifyOtpResponseDto } from './dto/verify-otp.dto';
 import { SignUpDto, SignUpResponseDto } from './dto/sign-up.dto';
 import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
+import { GetUser } from './decorator/get-user.decorator';
+import { User } from 'src/database/schema';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -39,5 +42,15 @@ export class AuthController {
   @ApiBody({ type: SignInDto })
   async signIn(@Body() signInDto: SignInDto): Promise<SignInResponseDto> {
     return await this.authService.signIn(signInDto);
+  }
+
+  @Get('/me')
+  @ApiOperation({ summary: 'Get user details' })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized.' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  async me(@GetUser() user : User ) {
+    return user;
   }
 }
