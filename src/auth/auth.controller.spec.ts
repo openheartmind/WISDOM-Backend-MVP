@@ -4,15 +4,18 @@ import { AuthController } from './auth.controller';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from 'src/database/database.module';
 import { AuthService } from './auth.service';
+import { SupabaseModule } from 'src/supabase/supabase.module';
+import { DatabaseService } from 'src/database/database.service';
+import { SupabaseService } from 'src/supabase/supabase.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule],
+      imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, SupabaseModule],
       controllers: [AuthController],
-      providers: [AuthService],
+      providers: [DatabaseService, SupabaseService, AuthService],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
