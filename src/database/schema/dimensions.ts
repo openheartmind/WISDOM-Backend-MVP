@@ -1,8 +1,8 @@
-import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 // Postgres schema (for dev and prod)
 export const pgDimensions = pgTable('dimensions', {
-  id: serial('id').primaryKey(),
+  id: uuid().primaryKey().defaultRandom(),
   title: text('title').notNull(),
   question: text('question').notNull(),
   createdAt: timestamp('created_at').defaultNow(),

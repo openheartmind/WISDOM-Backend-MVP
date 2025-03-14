@@ -8,6 +8,13 @@
       "when": 1741255533736,
       "tag": "0000_lean_franklin_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1741943368881,
+      "tag": "0001_omniscient_mad_thinker",
+      "breakpoints": true
     }
   ]
 }

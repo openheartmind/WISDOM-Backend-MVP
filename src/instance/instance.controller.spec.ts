@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { InstanceController } from './instance.controller';
 import { InstanceService } from './instance.service';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DatabaseModule } from 'src/database/database.module';
+import { DatabaseService } from 'src/database/database.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('InstanceController', () => {
   let controller: InstanceController;
@@ -11,7 +12,7 @@ describe('InstanceController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [DatabaseModule],
       controllers: [InstanceController],
-      providers: [InstanceService, NodePgDatabase],
+      providers: [InstanceService, DatabaseService, ConfigService],
     }).compile();
 
     controller = module.get<InstanceController>(InstanceController);

@@ -1,9 +1,9 @@
-import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { users } from './users';
 
 // Postgres schema (for dev and prod)
 export const pgInstances = pgTable('instances', {
-  id: serial('id').primaryKey(),
+  id: uuid().primaryKey().defaultRandom(),
   title: text('title').notNull(),
   description: text('description').notNull(),
   createdBy: text('created_by').references(() => users.authId),

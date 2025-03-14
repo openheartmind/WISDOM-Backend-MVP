@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CreateInstanceDto } from './dto/create-instance.dto';
+import { ExtendedCreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
-import { pgInstances } from '../database/schema';
+import { pgInstances, User } from '../database/schema';
 import { eq } from 'drizzle-orm';
 import { DatabaseService } from 'src/database/database.service';
 
@@ -10,7 +10,7 @@ export class InstanceService {
   constructor(private databaseService: DatabaseService) {
   }
 
-  async create(instance: CreateInstanceDto) {
+  async create(instance: ExtendedCreateInstanceDto, user: User) {
     return await this.databaseService.db.insert(pgInstances).values(instance).returning();
   }
 
@@ -18,13 +18,13 @@ export class InstanceService {
     return await this.databaseService.db.query.instances.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return await this.databaseService.db.query.instances.findFirst({
       where: eq(pgInstances.id, id),
     });
   }
 
-  async update(id: number, updateInstanceDto: UpdateInstanceDto) {
+  async update(id: string, updateInstanceDto: UpdateInstanceDto) {
     return await this.databaseService.db
       .update(pgInstances)
       .set(updateInstanceDto)
@@ -32,7 +32,7 @@ export class InstanceService {
       .returning();
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return await this.databaseService.db
       .delete(pgInstances)
       .where(eq(pgInstances.id, id))
