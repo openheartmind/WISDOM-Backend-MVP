@@ -7,7 +7,7 @@ import type { SentMessageInfo } from "nodemailer/lib/smtp-connection";
 @Injectable()
 export class MailerService {
   private mailer: Email;
-  private defaultFrom: string;
+  private defaultFrom: string | undefined;
   constructor(config: ConfigService<EnvironmentVariables>) {
     const user = config.getOrThrow<string>('SMTP_USER');
     const pass = config.getOrThrow<string>('SMTP_PASS');
@@ -24,8 +24,7 @@ export class MailerService {
         auth: {
           user,
           pass
-        },
-        from: this.defaultFrom
+        }
       },
       // send emails even in development or test
       send: true,
@@ -43,7 +42,10 @@ export class MailerService {
   }
 
   async send(options: Email.EmailOptions) {
-    options.message.from = options.message.from || this.defaultFrom;
+    if (options.message && !options.message.from) {
+      options.message.from = this.defaultFrom;
+    }
+
     const messageInfo = (await this.mailer.send(options)) as SentMessageInfo;
     return messageInfo;
   }
