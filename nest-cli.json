@@ -5,10 +5,10 @@
   "defaultLibraryPrefix": "@app",
   "compilerOptions": {
     "deleteOutDir": true,
-    "assets": [{
-      
-        "include": ".env"
-      
-    }]
+    "assets": [
+      { "include": ".env" },
+      { "include": "**/*.njk", "outDir": "./dist/src" }
+    ],
+    "watchAssets": true
   }
 }
