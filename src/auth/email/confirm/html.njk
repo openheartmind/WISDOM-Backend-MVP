@@ -1,0 +1,9 @@
+<h2>{{ displayName if displayName else "Hello" }}, confirm your signup</h2>
+
+<p>Follow this link to confirm your user:</p>
+<p>
+  <a
+    href="{{ baseURL }}/auth/sign-up/confirm?hashed_token={{ hashed_token }}"
+    >Confirm your email</a
+  >
+</p>

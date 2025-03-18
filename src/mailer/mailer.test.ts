@@ -1,7 +1,6 @@
 import { ConfigModule } from "@nestjs/config";
 import { Test } from "@nestjs/testing";
-import path from "path";
-import defaults, { validate } from "src/config/app-config"
+import * as path from "path";
 import { MailerService } from "./mailer.service"
 import { MailerModule } from "./mailer.module";
 
@@ -11,10 +10,7 @@ describe('MailerService', () => {
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
-        ConfigModule.forRoot({
-          validate,
-          load: [defaults],
-        }),
+        ConfigModule.forRoot({ isGlobal: true }),
         MailerModule
       ],
       providers: [MailerService]
