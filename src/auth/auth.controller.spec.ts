@@ -15,7 +15,12 @@ describe('AuthController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, SupabaseModule, MailerModule],
+      imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
+        DatabaseModule,
+        SupabaseModule,
+        MailerModule,
+      ],
       controllers: [AuthController],
       providers: [DatabaseService, SupabaseService, AuthService, MailerService],
     }).compile();

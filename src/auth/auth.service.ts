@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { DatabaseService } from 'src/database/database.service';
 import { eq } from 'drizzle-orm';
@@ -14,7 +19,7 @@ export class AuthService {
     private supabaseService: SupabaseService,
     private databaseService: DatabaseService,
     private mailerService: MailerService,
-  ) { }
+  ) {}
 
   async signIn(signInDto: SignInDto): Promise<SignInResponseDto> {
     const supabase = this.supabaseService.getClient();
@@ -28,7 +33,7 @@ export class AuthService {
         message: 'Failed to sign in',
         details: 'Invalid credentials',
         status: HttpStatus.UNAUTHORIZED,
-      })
+      });
     }
 
     if (error) {
@@ -40,30 +45,31 @@ export class AuthService {
     }
 
     const user = await this.databaseService.db.query.users.findFirst({
-      where: eq(users.authId, data.user.id)
-    })
+      where: eq(users.authId, data.user.id),
+    });
     if (!user) {
       throw new BadRequestException({
         message: 'Failed to sign in',
         details: 'User not found',
         status: HttpStatus.UNAUTHORIZED,
-      })
+      });
     }
 
     return {
       success: true,
       accessToken: data.session.access_token,
-      user: user
+      user: user,
     };
   }
 
   async signUp(signUpDto: SignUpDto): Promise<SignUpResponseDto> {
     const supabase = this.supabaseService.getServiceClient();
 
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email: signUpDto.email,
-      password: signUpDto.password,
-    });
+    const { data: authData, error: authError } =
+      await supabase.auth.admin.createUser({
+        email: signUpDto.email,
+        password: signUpDto.password,
+      });
     if (authError) {
       throw new BadRequestException({
         message: 'Failed to sign up',
@@ -80,20 +86,23 @@ export class AuthService {
     });
 
     try {
-      await this.emailSignUpConfirmation(signUpDto.email, signUpDto.displayName);
+      await this.emailSignUpConfirmation(
+        signUpDto.email,
+        signUpDto.displayName,
+      );
     } catch (error) {
       console.error('email error', error);
     }
 
     return {
-      success: true
+      success: true,
     };
   }
 
   async confirmSignUp(token_hash: string) {
-    const supabase = this.supabaseService.getClient()
+    const supabase = this.supabaseService.getClient();
     const {
-      data: { session },
+      // data: { session },
       error,
     } = await supabase.auth.verifyOtp({ token_hash, type: 'magiclink' });
 
@@ -106,7 +115,7 @@ export class AuthService {
     // how would we send the token to frontend in that case?
     // or do we redirect to frontend and require user to sign in afresh?
     return {
-      success: true
+      success: true,
     };
   }
 
@@ -114,7 +123,7 @@ export class AuthService {
     const supabase = this.supabaseService.getServiceClient();
     const { data, error } = await supabase.auth.admin.generateLink({
       email,
-      type: 'magiclink'
+      type: 'magiclink',
     });
 
     if (error) {
@@ -129,14 +138,14 @@ export class AuthService {
     const msgInfo = await this.mailerService.send({
       template: join(__dirname, 'email', 'confirm'),
       message: {
-        to: email
+        to: email,
       },
       locals: {
         displayName,
         hashed_token,
-        baseURL: 'http://localhost:3000'
-      }
-    })
+        baseURL: 'http://localhost:3000',
+      },
+    });
 
     return msgInfo;
   }

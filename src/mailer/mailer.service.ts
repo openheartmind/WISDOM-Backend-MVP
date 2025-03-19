@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { EnvironmentVariables } from "src/config/app-config";
-import * as Email from 'email-templates';
-import type { SentMessageInfo } from "nodemailer/lib/smtp-connection";
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { EnvironmentVariables } from 'src/config/app-config';
+import Email, { EmailOptions } from 'email-templates';
+import type { SentMessageInfo } from 'nodemailer/lib/smtp-connection';
 
 @Injectable()
 export class MailerService {
@@ -23,8 +23,8 @@ export class MailerService {
         secure,
         auth: {
           user,
-          pass
-        }
+          pass,
+        },
       },
       // send emails even in development or test
       send: true,
@@ -33,21 +33,21 @@ export class MailerService {
       views: {
         options: {
           // expect nunjucks templates
-          extension: 'njk'
-        }
+          extension: 'njk',
+        },
       },
       message: {
         // default sender
-        from
-      }
-    })
+        from,
+      },
+    });
   }
 
   getMailer() {
     return this.mailer;
   }
 
-  async send(options: Email.EmailOptions) {
+  async send(options: EmailOptions) {
     const messageInfo = (await this.mailer.send(options)) as SentMessageInfo;
     return messageInfo;
   }

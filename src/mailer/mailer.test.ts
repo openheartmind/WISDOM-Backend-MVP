@@ -1,19 +1,16 @@
-import { ConfigModule } from "@nestjs/config";
-import { Test } from "@nestjs/testing";
-import * as path from "path";
-import { MailerService } from "./mailer.service"
-import { MailerModule } from "./mailer.module";
+import { ConfigModule } from '@nestjs/config';
+import { Test } from '@nestjs/testing';
+import { join } from 'path';
+import { MailerService } from './mailer.service';
+import { MailerModule } from './mailer.module';
 
 describe('MailerService', () => {
   let mailerService: MailerService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
-        MailerModule
-      ],
-      providers: [MailerService]
+      imports: [ConfigModule.forRoot({ isGlobal: true }), MailerModule],
+      providers: [MailerService],
     }).compile();
 
     mailerService = moduleRef.get(MailerService);
@@ -24,7 +21,7 @@ describe('MailerService', () => {
       const recepient = 'email@example.com';
       const msgInfo = await mailerService.send({
         // our template is provided as an absolute path to ./test/hello
-        template: path.join(__dirname, 'test', 'hello'),
+        template: join(__dirname, 'test', 'hello'),
         message: {
           to: recepient,
           // subject: 'included in template'
@@ -32,8 +29,8 @@ describe('MailerService', () => {
           // text: 'extracted from html'
         },
         locals: {
-          name: 'Test User'
-        }
+          name: 'Test User',
+        },
       });
 
       // console.log(msgInfo);
