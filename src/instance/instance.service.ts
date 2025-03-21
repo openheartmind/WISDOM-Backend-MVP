@@ -4,6 +4,8 @@ import { UpdateInstanceDto } from './dto/update-instance.dto';
 import { pgInstances, User } from '../database/schema';
 import { eq } from 'drizzle-orm';
 import { DatabaseService } from 'src/database/database.service';
+import { AddMemberDto } from './dto/add-member.dto';
+import { pgMemberships } from 'src/database/schema/memberships';
 
 @Injectable()
 export class InstanceService {
@@ -37,5 +39,12 @@ export class InstanceService {
       .delete(pgInstances)
       .where(eq(pgInstances.id, id))
       .returning();
+  }
+
+  async addMember(dto: AddMemberDto){
+    return await this.databaseService.db
+      .insert(pgMemberships)
+      .values(dto)
+      .returning()
   }
 }

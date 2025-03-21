@@ -16,6 +16,7 @@ import { User } from 'src/database/schema';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AddMemberDto } from './dto/add-member.dto';
 
 @Controller('instance')
 export class InstanceController {
@@ -64,5 +65,10 @@ export class InstanceController {
   @UseGuards(AuthGuard) @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.instanceService.remove(id);
+  }
+
+  @Post(':id/members')
+  addMember(@Body() addMemberDto: AddMemberDto, @GetUser() user: User){
+    return this.instanceService.addMember(addMemberDto)
   }
 }
