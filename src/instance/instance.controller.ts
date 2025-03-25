@@ -37,21 +37,24 @@ export class InstanceController {
 
   @Get()
   @ApiOperation({ summary: 'List all instances viewable by user' })
-  @UseGuards(AuthGuard) @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   findAll() {
     return this.instanceService.findAll();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Display instance by id' })
-  @UseGuards(AuthGuard) @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   findOne(@Param('id') id: string) {
     return this.instanceService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update instance by id' })
-  @UseGuards(AuthGuard) @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   update(
     @Param('id') id: string,
     @Body() updateInstanceDto: UpdateInstanceDto,
@@ -61,7 +64,8 @@ export class InstanceController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete instance by id' })
-  @UseGuards(AuthGuard) @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.instanceService.remove(id);
   }
