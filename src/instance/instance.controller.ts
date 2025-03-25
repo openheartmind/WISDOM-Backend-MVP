@@ -68,7 +68,8 @@ export class InstanceController {
   }
 
   @Post(':id/members')
-  addMember(@Body() addMemberDto: AddMemberDto, @GetUser() user: User){
+  addMember(@Body() addMemberDto: AddMemberDto, @GetUser() user: User, @Param('id') id: string,){
+    addMemberDto.userId = id
     return this.instanceService.addMember(addMemberDto)
   }
 }
