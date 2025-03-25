@@ -12,6 +12,8 @@ import { SignUpDto, SignUpResponseDto } from './dto/sign-up.dto';
 import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
 import { MailerService } from 'src/mailer/mailer.service';
 import { join } from 'path';
+import { ConfigService } from '@nestjs/config';
+import { EnvironmentVariables } from 'src/config/app-config';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +21,8 @@ export class AuthService {
     private supabaseService: SupabaseService,
     private databaseService: DatabaseService,
     private mailerService: MailerService,
-  ) {}
+    private config: ConfigService<EnvironmentVariables>
+  ) { }
 
   async signIn(signInDto: SignInDto): Promise<SignInResponseDto> {
     const supabase = this.supabaseService.getClient();
@@ -86,10 +89,16 @@ export class AuthService {
     });
 
     try {
-      await this.emailSignUpConfirmation(
+      const { rejected, rejectedErrors } = await this.emailSignUpConfirmation(
         signUpDto.email,
         signUpDto.displayName,
       );
+
+      if (rejected.length > 0) {
+        throw new Error(`Email "${rejected[0]}" was rejected`, {
+          cause: rejectedErrors
+        })
+      }
     } catch (error) {
       console.error('email error', error);
     }
@@ -120,6 +129,7 @@ export class AuthService {
   }
 
   private async emailSignUpConfirmation(email: string, displayName?: string) {
+    const confirmBaseURL = this.config.getOrThrow<string>('SIGNUP_CONFIRM_BASE_URL');
     const supabase = this.supabaseService.getServiceClient();
     const { data, error } = await supabase.auth.admin.generateLink({
       email,
@@ -135,6 +145,9 @@ export class AuthService {
     }
 
     const { hashed_token } = data.properties;
+    const confirmURL = new URL(confirmBaseURL);
+    confirmURL.search = `hashed_token=${hashed_token}`;
+
     const msgInfo = await this.mailerService.send({
       template: join(__dirname, 'email', 'confirm'),
       message: {
@@ -142,8 +155,7 @@ export class AuthService {
       },
       locals: {
         displayName,
-        hashed_token,
-        baseURL: 'http://localhost:3000',
+        confirmURL: confirmURL.toString(),
       },
     });
 

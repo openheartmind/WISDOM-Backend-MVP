@@ -61,6 +61,13 @@ export class EnvironmentVariables {
   @IsOptional()
   @IsString()
   SMTP_FROM: string;
+
+  @IsUrl({
+    protocols: ['http', 'https'],
+    require_protocol: true,
+    require_tld: false,
+  })
+  SIGNUP_CONFIRM_BASE_URL: string;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -94,4 +101,5 @@ export default () =>
       ? process.env.SMTP_TLS.trim().toLowerCase() === 'true'
       : false,
     SMTP_FROM: process.env.SMTP_FROM || 'test@example.com',
+    SIGNUP_CONFIRM_BASE_URL: process.env.SIGNUP_CONFIRM_BASE_URL,
   }) as EnvironmentVariables;
