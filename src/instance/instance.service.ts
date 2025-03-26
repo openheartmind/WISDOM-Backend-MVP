@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { ExtendedCreateInstanceDto } from './dto/create-instance.dto';
+import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
 import { pgInstances, User } from '../database/schema';
 import { eq } from 'drizzle-orm';
@@ -10,7 +10,7 @@ export class InstanceService {
   constructor(private databaseService: DatabaseService) {
   }
 
-  async create(instance: ExtendedCreateInstanceDto, user: User) {
+  async create(instance: CreateInstanceDto, user: User) {
     return await this.databaseService.db.insert(pgInstances).values(instance).returning();
   }
 

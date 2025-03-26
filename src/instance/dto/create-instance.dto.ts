@@ -6,8 +6,5 @@ export class CreateInstanceDto {
 
     @ApiProperty({ example: 'This is an instance for a conference', description: 'Full description of instance' })
     description: string
-}
-
-export class ExtendedCreateInstanceDto extends CreateInstanceDto {
-    createdBy?
+    createdBy?: string
 }

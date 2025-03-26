@@ -10,7 +10,7 @@ import {
   HttpStatus
 } from '@nestjs/common';
 import { InstanceService } from './instance.service';
-import { CreateInstanceDto, ExtendedCreateInstanceDto } from './dto/create-instance.dto';
+import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
 import { User } from 'src/database/schema';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
@@ -29,8 +29,7 @@ export class InstanceController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard) @UseGuards(AuthGuard)
   create(@Body() createInstanceDto: CreateInstanceDto, @GetUser() user: User) {
-    let instance: ExtendedCreateInstanceDto
-    instance = createInstanceDto
+    const instance =  createInstanceDto
     instance.createdBy = user.authId
     return this.instanceService.create(createInstanceDto, user)
   }
