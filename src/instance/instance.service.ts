@@ -10,7 +10,7 @@ export class InstanceService {
   constructor(private databaseService: DatabaseService) {
   }
 
-  async create(instance: CreateInstanceDto, user: User) {
+  async create(instance: CreateInstanceDto) {
     return await this.databaseService.db.insert(pgInstances).values(instance).returning();
   }
 

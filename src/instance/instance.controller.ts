@@ -28,10 +28,10 @@ export class InstanceController {
   @ApiBody({ type:CreateInstanceDto })
   @ApiBearerAuth()
   @UseGuards(AuthGuard) @UseGuards(AuthGuard)
-  create(@Body() createInstanceDto: CreateInstanceDto, @GetUser() user: User) {
-    const instance =  createInstanceDto
-    instance.createdBy = user.authId
-    return this.instanceService.create(createInstanceDto, user)
+  create(@Body() createInstanceDto: CreateInstanceDto, @GetUser() user: User) { 
+    createInstanceDto.createdBy = user.authId
+    console.log(createInstanceDto)
+    return this.instanceService.create(createInstanceDto)
   }
 
   @Get()
