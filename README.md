@@ -58,6 +58,14 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Development URLs
+
+When running the project in development environment, you can access local insances of the different parts through:
+
+- Swagger/OpenAPI docs: http://localhost:3000/docs
+- Supabase Studio: http://localhost:54323
+- Inbucket (test email): http://loclhost:5050
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
