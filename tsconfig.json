@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "module": "commonjs",
+    "module": "nodenext",
     "target": "esnext",
     "outDir": "./dist",
     "baseUrl": "./",
