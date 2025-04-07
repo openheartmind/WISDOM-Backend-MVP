@@ -45,6 +45,8 @@ The output should indicate whether a local Supabase instance is running or not, 
 npx supabase status
 ```
 
+Make sure that the value of SUPABASE_KEY corresponds to the "anon key" from and SUPABASE_SERVICE_KEY correspond to "service_role key"
+
 Once Supabase was successfully initialized and running, we run the Drizzle migration command to make sure we get the latest database schemas. This command generates the database based on the local SQL files.
 ```
 npx drizzle-kit generate
@@ -85,3 +87,9 @@ When running the project in development environment, you can access local insanc
 
 
 ## Troubleshooting
+### Error message - Invalid JWT: unable to parse or verify signature. token signature is invalid...
+Run the command:
+```
+npx supabase status
+```
+and re-assign the keys to your _.env_ file as they may be incorrect.
