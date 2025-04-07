@@ -10,7 +10,7 @@ import {
   HttpStatus
 } from '@nestjs/common';
 import { InstanceService } from './instance.service';
-import { CreateInstanceDto, ExtendedCreateInstanceDto } from './dto/create-instance.dto';
+import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
 import { User } from 'src/database/schema';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
@@ -29,30 +29,32 @@ export class InstanceController {
   @ApiBody({ type:CreateInstanceDto })
   @ApiBearerAuth()
   @UseGuards(AuthGuard) @UseGuards(AuthGuard)
-  create(@Body() createInstanceDto: CreateInstanceDto, @GetUser() user: User) {
-    let instance: ExtendedCreateInstanceDto
-    instance = createInstanceDto
-    instance.createdBy = user.authId
-    return this.instanceService.create(createInstanceDto, user)
+  create(@Body() createInstanceDto: CreateInstanceDto, @GetUser() user: User) { 
+    createInstanceDto.createdBy = user.authId
+    console.log(createInstanceDto)
+    return this.instanceService.create(createInstanceDto)
   }
 
   @Get()
   @ApiOperation({ summary: 'List all instances viewable by user' })
-  @UseGuards(AuthGuard) @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   findAll() {
     return this.instanceService.findAll();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Display instance by id' })
-  @UseGuards(AuthGuard) @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   findOne(@Param('id') id: string) {
     return this.instanceService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update instance by id' })
-  @UseGuards(AuthGuard) @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   update(
     @Param('id') id: string,
     @Body() updateInstanceDto: UpdateInstanceDto,
@@ -62,7 +64,8 @@ export class InstanceController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete instance by id' })
-  @UseGuards(AuthGuard) @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.instanceService.remove(id);
   }
