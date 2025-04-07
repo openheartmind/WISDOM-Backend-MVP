@@ -1,9 +1,12 @@
-import { IsBoolean, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SuccessDto } from 'src/dto/success.dto';
 
 export class SignUpDto {
-  @ApiProperty({ example: 'user@example.com', description: 'User email address' })
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'User email address',
+  })
   @IsEmail()
   @IsNotEmpty()
   readonly email: string;
@@ -13,11 +16,13 @@ export class SignUpDto {
   @IsNotEmpty()
   readonly password: string;
 
-  @ApiPropertyOptional({ example: 'Dipanshu', description: 'The full name of the user' })
+  @ApiPropertyOptional({
+    example: 'Dipanshu',
+    description: 'The full name of the user',
+  })
   @IsOptional()
   @IsString()
-  readonly displayName?: string; 
+  readonly displayName?: string;
 }
 
-export class SignUpResponseDto extends SuccessDto  { 
-}
+export class SignUpResponseDto extends SuccessDto {}
