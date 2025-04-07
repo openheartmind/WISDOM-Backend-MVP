@@ -57,6 +57,31 @@ npm run start:dev
 
 At this point, your backend should be running.
 
+To complie the project for production, run the following:
+```
+npm run start:prod
+```
+
+## Run tests
+
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
+```
+
+## Development URLs
+
+When running the project in development environment, you can access local insances of the different parts through:
+
+- Swagger/OpenAPI docs: http://localhost:3000/docs
+- Supabase Studio: http://localhost:54323
+- Inbucket (test email): http://loclhost:5050
+
 
 ## Troubleshooting
-
