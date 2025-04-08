@@ -86,6 +86,16 @@ When running the project in development environment, you can access local insanc
 - Inbucket (test email): http://loclhost:5050
 
 
+## Database Maintenance
+
+As part of setting up Supabase locally, you receive the connection string to connect into the database. This allows managing the content manually using any postgres client software.
+
+Authentication is managed both by Supabase and our own custom table.
+
+The _users_ table of Supabase is stored under the _auth_ schema.
+
+Our custom _users_ table is stored under the _public_ schema.
+
 ## Troubleshooting
 ### Error message - Invalid JWT: unable to parse or verify signature. token signature is invalid...
 Run the command:
