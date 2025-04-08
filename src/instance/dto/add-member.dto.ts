@@ -1,8 +1,8 @@
-import {  ApiPropertyOptional } from "@nestjs/swagger"
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class AddMemberDto {
-    roleId: string
-    @ApiPropertyOptional()
-    instanceId: string
-    userId: string
+  roleId: number;
+  @ApiPropertyOptional()
+  instanceId: string;
+  userId: string;
 }

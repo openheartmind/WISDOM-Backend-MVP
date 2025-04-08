@@ -1,14 +1,13 @@
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { users } from './users';
 import { instances } from './instances';
-import { roles } from './roles';
 
 // Postgres schema (for dev and prod)
-export const pgMemberships = pgTable('instances', {
+export const pgMemberships = pgTable('memberships', {
   id: uuid().primaryKey().defaultRandom(),
   userId: text('user_id').references(() => users.authId),
-  instanceId: text('instance_id').references(() => instances.id),
-  roleId: text('role_id').references(() => roles.id),
+  instanceId: uuid('instance_id').references(() => instances.id),
+  roleId: integer('role_id'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

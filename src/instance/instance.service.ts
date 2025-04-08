@@ -1,29 +1,52 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
-import { pgInstances, User } from '../database/schema';
-import { eq } from 'drizzle-orm';
+import { pgInstances, pgMemberships } from '../database/schema';
+import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from 'src/database/database.service';
 import { AddMemberDto } from './dto/add-member.dto';
-import { pgMemberships } from 'src/database/schema/memberships';
+import { roles } from './instance.roles';
 
 @Injectable()
 export class InstanceService {
-  constructor(private databaseService: DatabaseService) {
-  }
+  constructor(private databaseService: DatabaseService) {}
 
   async create(instance: CreateInstanceDto) {
-    return await this.databaseService.db.insert(pgInstances).values(instance).returning();
+    const [created] = await this.databaseService.db
+      .insert(pgInstances)
+      .values(instance)
+      .returning();
+
+    await this.databaseService.db
+      .insert(pgMemberships)
+      .values({
+        instanceId: created.id,
+        roleId: roles.MANAGER,
+        userId: created.createdBy,
+      })
+      .returning();
+
+    return created;
   }
 
   async findAll() {
     return await this.databaseService.db.query.instances.findMany();
   }
 
-  async findOne(id: string) {
-    return await this.databaseService.db.query.instances.findFirst({
-      where: eq(pgInstances.id, id),
-    });
+  async findOne(id: string, userId: string) {
+    const [instance] = await this.databaseService.db
+      .select({
+        id: pgInstances.id,
+        title: pgInstances.title,
+        description: pgInstances.description,
+        memberships: {
+          roleId: pgMemberships.roleId,
+        },
+      })
+      .from(pgInstances)
+      .leftJoin(pgMemberships, eq(pgInstances.id, pgMemberships.instanceId))
+      .where(and(eq(pgInstances.id, id), eq(pgMemberships.userId, userId)));
+    return instance;
   }
 
   async update(id: string, updateInstanceDto: UpdateInstanceDto) {
@@ -41,10 +64,10 @@ export class InstanceService {
       .returning();
   }
 
-  async addMember(dto: AddMemberDto){
+  async addMember(dto: AddMemberDto) {
     return await this.databaseService.db
       .insert(pgMemberships)
       .values(dto)
-      .returning()
+      .returning();
   }
 }
