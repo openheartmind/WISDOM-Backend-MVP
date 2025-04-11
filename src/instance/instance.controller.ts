@@ -65,25 +65,28 @@ export class InstanceController {
   update(
     @Param('id') id: string,
     @Body() updateInstanceDto: UpdateInstanceDto,
+    @GetUser() user: User,
   ) {
-    return this.instanceService.update(id, updateInstanceDto);
+    return this.instanceService.update(id, updateInstanceDto, user.authId);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete instance by id' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  remove(@Param('id') id: string) {
-    return this.instanceService.remove(id);
+  remove(@Param('id') id: string, @GetUser() user: User) {
+    return this.instanceService.remove(id, user.authId);
   }
 
   @Post(':id/members')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   addMember(
+    @Param('id') id: string,
     @Body() addMemberDto: AddMemberDto,
     @GetUser() user: User,
-    @Param('id') id: string,
   ) {
     addMemberDto.instanceId = id;
-    return this.instanceService.addMember(addMemberDto);
+    return this.instanceService.addMember(user.authId, addMemberDto);
   }
 }
