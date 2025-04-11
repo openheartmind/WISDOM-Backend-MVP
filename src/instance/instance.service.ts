@@ -29,8 +29,17 @@ export class InstanceService {
     return created;
   }
 
-  async findAll() {
-    return await this.databaseService.db.query.instances.findMany();
+  async findAll(userId: string) {
+    return await this.databaseService.db
+      .select({
+        id: pgInstances.id,
+        title: pgInstances.title,
+        description: pgInstances.description,
+      })
+      .from(pgInstances)
+      .leftJoin(pgMemberships, eq(pgInstances.id, pgMemberships.instanceId))
+      .where(eq(pgMemberships.userId, userId));
+    //return await this.databaseService.db.query.instances.findMany();
   }
 
   async findOne(id: string, userId: string) {

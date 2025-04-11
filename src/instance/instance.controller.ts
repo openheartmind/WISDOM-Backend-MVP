@@ -46,8 +46,8 @@ export class InstanceController {
   @ApiOperation({ summary: 'List all instances viewable by user' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  findAll() {
-    return this.instanceService.findAll();
+  findAll(@GetUser() user: User) {
+    return this.instanceService.findAll(user.authId);
   }
 
   @Get(':id')
