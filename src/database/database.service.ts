@@ -23,7 +23,7 @@ export class DatabaseService implements OnModuleInit {
     const env = this.configService.getOrThrow('NODE_ENV');
 
     if (env === 'test') {
-      const pgliteDB = new PGlite();
+      const pgliteDB = new PGlite('./test_db');
 
       this.db = drizzlePglite(pgliteDB, { schema: schema });
     } else {
