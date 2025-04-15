@@ -15,6 +15,7 @@ zerops:
       # after the build successfully finished
       deployFiles:
         - dist
+        - tsconfig.json
         - package.json
         - node_modules
 
