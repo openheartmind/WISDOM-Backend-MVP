@@ -47,9 +47,15 @@ npx supabase status
 
 Make sure that the value of SUPABASE_KEY corresponds to the "anon key" from and SUPABASE_SERVICE_KEY correspond to "service_role key"
 
-Once Supabase was successfully initialized and running, we run the Drizzle migration command to make sure we get the latest database schemas. This command generates the database based on the local SQL files.
+Once Supabase was successfully initialized and running, we run the Drizzle migration command to make sure we set the database schemas to match the file-based schemas. This command runs the SQL migration files which will align the database based on the local SQL files.
+```
+npx drizzle-kit migrate
+```
+
+If any changes are made to the local schema files, the following command needs to be executed to re-create the SQL files with these changes, followed by the command to apply it on the database.
 ```
 npx drizzle-kit generate
+npx drizzle-kit migrate
 ```
 
 Finally, we are ready to run the development environment by running the following command:
