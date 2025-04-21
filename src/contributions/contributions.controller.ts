@@ -44,6 +44,7 @@ import {
   
     @Patch(':id')
     @UseGuards(AuthGuard)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Update a contribution' })
     @ApiResponse({ status: 200, description: 'Contribution updated successfully' })
     @ApiResponse({ status: 404, description: 'Contribution not found' })
@@ -58,6 +59,7 @@ import {
   
     @Delete(':id')
     @UseGuards(AuthGuard)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Delete a contribution' })
     @ApiResponse({ status: 200, description: 'Contribution deleted successfully' })
     @ApiResponse({ status: 404, description: 'Contribution not found' })
