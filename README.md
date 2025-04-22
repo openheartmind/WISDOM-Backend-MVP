@@ -1,48 +1,73 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Wisdom Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Initial Setup
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Prerequisites:
+* Git
+* Code IDE (e.g. VS Code)
+* Docker
+* NodeJS
 
-## Description
+First, we clone the repository by executing the following command at your desired file path:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+```
+git clone https://github.com/openheartmind/WISDOM-Backend-MVP
 ```
 
-## Compile and run the project
+Next, open the cloned repository with your IDE and in the terminal window, execute the installation command:
+```
+npm i
+```
 
-```bash
-# development
-$ npm run start
+Next, we install Supabase as a local copy. Run the following command to initialize it on your machine:
+```
+npx supabase init
+```
 
-# watch mode
-$ npm run start:dev
+** If the Supabase was already initialized, it might be different than the latest version and you might need to reset it with the following command:
+```
+npx supabase db reset
+```
 
-# production mode
-$ npm run start:prod
+To be able to complete the setup of the backend, we need to configure all the environmental variables.
+
+Make a copy of the file _.env.example_ and name it _.env_
+
+Next, populate all the example values of the variables with the right input. Most of these values will be presented once the Supabase instance runs locally.
+
+To start the Supabase instance and get the environmental variables, execute the following command.:
+```
+npx supabase start
+```
+
+The output should indicate whether a local Supabase instance is running or not, but if you're unsure and would like to check again, you can run the following command:
+```
+npx supabase status
+```
+
+Make sure that the value of SUPABASE_KEY corresponds to the "anon key" from and SUPABASE_SERVICE_KEY correspond to "service_role key"
+
+Once Supabase was successfully initialized and running, we run the Drizzle migration command to make sure we set the database schemas to match the file-based schemas. This command runs the SQL migration files which will align the database based on the local SQL files.
+```
+npx drizzle-kit migrate
+```
+
+If any changes are made to the local schema files, the following command needs to be executed to re-create the SQL files with these changes, followed by the command to apply it on the database.
+```
+npx drizzle-kit generate
+npx drizzle-kit migrate
+```
+
+Finally, we are ready to run the development environment by running the following command:
+```
+npm run start:dev
+```
+
+At this point, your backend should be running.
+
+To complie the project for production, run the following:
+```
+npm run start:prod
 ```
 
 ## Run tests
@@ -66,42 +91,37 @@ When running the project in development environment, you can access local insanc
 - Supabase Studio: http://localhost:54323
 - Inbucket (test email): http://loclhost:5050
 
-## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Database Maintenance
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+As part of setting up Supabase locally, you receive the connection string to connect into the database. This allows managing the content manually using any postgres client software.
 
-```bash
-$ npm install -g mau
-$ mau deploy
+Authentication is managed both by Supabase and our own custom table.
+
+The _users_ table of Supabase is stored under the _auth_ schema.
+
+Our custom _users_ table is stored under the _public_ schema.
+
+## Troubleshooting
+### Error message - Invalid JWT: unable to parse or verify signature. token signature is invalid...
+Run the command:
+```
+npx supabase status
+```
+and re-assign the keys to your _.env_ file as they may be incorrect.
+
+### Error message - Database connection failed
+First, make sure you know how to connect to the database locally with a database client as specified for your instance in the DB Url when running the following command -
+```
+npx supabase status
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+If for some reason your local database instance is no longer able to connect, use the following commands to reinitialize it -
+```
+npx supabase stop
+npx supabase start
+```
+This will restart the Docker container of Supabase and will download 
+and reinstall any broken components of the instance.
 
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+After restarting your instance, try once again to reconnect to your database
