@@ -109,3 +109,19 @@ Run the command:
 npx supabase status
 ```
 and re-assign the keys to your _.env_ file as they may be incorrect.
+
+### Error message - Database connection failed
+First, make sure you know how to connect to the database locally with a database client as specified for your instance in the DB Url when running the following command -
+```
+npx supabase status
+```
+
+If for some reason your local database instance is no longer able to connect, use the following commands to reinitialize it -
+```
+npx supabase stop
+npx supabase start
+```
+This will restart the Docker container of Supabase and will download 
+and reinstall any broken components of the instance.
+
+After restarting your instance, try once again to reconnect to your database
