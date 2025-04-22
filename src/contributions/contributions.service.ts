@@ -8,7 +8,7 @@ import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class ContributionsService {
-  constructor(private db: DatabaseService) {}
+  constructor(private dbService: DatabaseService) { }
 
   async create(createContributionDto: CreateContributionDto, userId: string) {
     //TO DO: Check if user has access to instance
@@ -16,7 +16,7 @@ export class ContributionsService {
 
     const { title, content, instanceId } = createContributionDto;
 
-    const result = await this.db.db.insert(contributions).values({
+    const result = await this.dbService.db.insert(contributions).values({
       title,
       content,
       instanceId,
@@ -27,7 +27,7 @@ export class ContributionsService {
   }
 
   async findAll() {
-    return this.db.db.query.contributions.findMany({
+    return this.dbService.db.query.contributions.findMany({
       with: {
         instance: true,
         contributor: {
@@ -44,7 +44,7 @@ export class ContributionsService {
   }
 
   async findOne(id: string) {
-    const contribution = await this.db.db.query.contributions.findFirst({
+    const contribution = await this.dbService.db.query.contributions.findFirst({
       where: eq(contributions.id, id),
       with: {
         instance: true,
@@ -69,10 +69,10 @@ export class ContributionsService {
 
   async update(id: string, updateContributionDto: UpdateContributionDto, userId: string) {
     const contribution = await this.findOne(id);
-    
+
     // Add authorization check here later
 
-    const result = await this.db.db.update(contributions)
+    const result = await this.dbService.db.update(contributions)
       .set({
         ...updateContributionDto,
         updatedAt: new Date(),
@@ -85,19 +85,19 @@ export class ContributionsService {
 
   async remove(id: string, userId: string) {
     const contribution = await this.findOne(id);
-    
+
     // Add authorization check here later
 
-    await this.db.db.delete(contributions)
+    await this.dbService.db.delete(contributions)
 
-    await this.db.db.delete(contributions)
+    await this.dbService.db.delete(contributions)
       .where(eq(contributions.id, id));
 
     return { deleted: true };
   }
 
   async findByInstance(instanceId: string) {
-    return this.db.db.query.contributions.findMany({
+    return this.dbService.db.query.contributions.findMany({
       where: eq(contributions.instanceId, instanceId),
       with: {
         contributor: {
