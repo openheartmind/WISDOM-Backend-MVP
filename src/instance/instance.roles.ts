@@ -1,5 +1,5 @@
 export enum roles {
-  MANAGER,
-  REVIEWER,
-  METAREVIEWER,
+  MANAGER = 'Manager',
+  REVIEWER = 'Reviewer',
+  METAREVIEWER = 'Metareviewer',
 }

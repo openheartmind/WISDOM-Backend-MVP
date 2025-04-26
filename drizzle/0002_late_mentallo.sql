@@ -2,7 +2,7 @@ CREATE TABLE "memberships" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" text,
 	"instance_id" uuid,
-	"role_id" integer,
+	"role" text,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );

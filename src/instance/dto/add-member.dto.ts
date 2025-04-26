@@ -5,7 +5,7 @@ export class AddMemberDto {
     example: '0',
     description: 'The id of the role to be assigned to the user',
   })
-  roleId: number;
+  role: string;
   @ApiPropertyOptional()
   instanceId: string;
   @ApiProperty({

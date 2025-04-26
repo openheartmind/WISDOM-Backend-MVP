@@ -1,5 +1,5 @@
 {
-  "id": "7d5d444c-fa8c-4717-9442-48ca81a05374",
+  "id": "e70c7573-8860-4517-8ac4-39e1519d5e47",
   "prevId": "190f384c-5971-4eaf-be7f-4e7cff284a19",
   "version": "7",
   "dialect": "postgresql",
@@ -192,9 +192,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "role_id": {
-          "name": "role_id",
-          "type": "integer",
+        "role": {
+          "name": "role",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
