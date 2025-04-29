@@ -7,7 +7,7 @@ export const pgMemberships = pgTable('memberships', {
   id: uuid().primaryKey().defaultRandom(),
   userId: text('user_id').references(() => users.authId),
   instanceId: uuid('instance_id').references(() => instances.id),
-  roleId: text('role'),
+  role: text('role'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

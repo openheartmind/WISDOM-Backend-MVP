@@ -21,7 +21,7 @@ export class InstanceService {
       .insert(pgMemberships)
       .values({
         instanceId: created.id,
-        roleId: roles.MANAGER,
+        role: roles.MANAGER,
         userId: created.createdBy,
       })
       .returning();
@@ -49,7 +49,7 @@ export class InstanceService {
         title: pgInstances.title,
         description: pgInstances.description,
         memberships: {
-          roleId: pgMemberships.roleId,
+          roleId: pgMemberships.role,
         },
       })
       .from(pgInstances)
@@ -70,7 +70,7 @@ export class InstanceService {
           eq(pgMemberships.instanceId, id),
         ),
       });
-    if (membership?.roleId !== roles.MANAGER) {
+    if (membership?.role !== roles.MANAGER) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
 
@@ -104,7 +104,7 @@ export class InstanceService {
           eq(pgMemberships.instanceId, dto.instanceId),
         ),
       });
-    if (userMembership?.roleId !== roles.MANAGER) {
+    if (userMembership?.role !== roles.MANAGER) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
     const membership =
@@ -115,6 +115,7 @@ export class InstanceService {
         ),
       });
     if (membership) {
+      console.log(dto);
       return await this.databaseService.db
         .update(pgMemberships)
         .set(dto)
