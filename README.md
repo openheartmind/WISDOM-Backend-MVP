@@ -109,7 +109,7 @@ When running the project in development environment, you can access local insanc
 
 - Swagger/OpenAPI docs: http://localhost:3000/docs
 - Supabase Studio: http://localhost:54323
-- Inbucket (test email): http://loclhost:5050
+- Inbucket (test email): http://localhost:5050
 
 
 ## Database Maintenance
