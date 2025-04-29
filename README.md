@@ -72,6 +72,7 @@ npm run start:prod
 
 ## Run tests
 
+### Automated Tests
 ```bash
 # unit tests
 $ npm run test
@@ -82,6 +83,25 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+### Manual Workflows - User Creation
+The creation of a new user in the app has 2 steps:
+1. Creation of a user record inside Supabase Auth module
+2. Creation of a user record inside Supabase public database
+
+As part of our security mechanism, a user is active in the system only after it has been verified with a One-Time-Password sent via email after step one.
+
+After the creation of a user in Supabase Auth module, a secret token is assigned to that user, which needs to be verified in a short period of time.
+
+The verification process of that token can be done either through the front-end or backend verification endpoints.
+
+First, we get extract the token. There are a few options to do so:
+1. Use a valid email address for the user, which will receive the token as part of the email body and a link for activation - This option requires all environmental parameters to use a valid SMTP server to send the email.
+
+2. Use the InBucket service to see the content of the email that is sent. The InBucket is a fake SMTP service for testing purposes and is accessible as part of the development environment URLs list mentioned in this document.
+
+3. Connect to your local database instance with an PostgresSQL client and extract that value from the _auth_ schema in the _users_ table.
+
 
 ## Development URLs
 
@@ -125,3 +145,10 @@ This will restart the Docker container of Supabase and will download
 and reinstall any broken components of the instance.
 
 After restarting your instance, try once again to reconnect to your database
+
+### Error message - Failing to recreate Drizzle migration files
+It's most likely that you have conflicts. The following command should resolve it all, but it will reset the content of the database -
+
+```
+npx supabase db reset
+```
