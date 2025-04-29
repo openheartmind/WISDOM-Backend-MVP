@@ -4,6 +4,7 @@ import appConfig, { validate } from './config/app-config';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { InstanceModule } from './instance/instance.module';
+import { ContributionsModule } from './contributions/contributions.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { InstanceModule } from './instance/instance.module';
     }),
     DatabaseModule,
     AuthModule,
-    InstanceModule
+    InstanceModule,
+    ContributionsModule
   ],
   controllers: [],
 })
