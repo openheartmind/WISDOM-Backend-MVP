@@ -29,6 +29,13 @@ npx supabase init
 npx supabase db reset
 ```
 
+After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again. Best to run the generate command as well to make sure all the latest schema changes are present -
+
+```
+npx drizzle-kit generate
+npx drizzle-kit migrate
+```
+
 To be able to complete the setup of the backend, we need to configure all the environmental variables.
 
 Make a copy of the file _.env.example_ and name it _.env_
@@ -151,4 +158,11 @@ It's most likely that you have conflicts. The following command should resolve i
 
 ```
 npx supabase db reset
+```
+
+After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again. Best to run the generate command as well to make sure all the latest schema changes are present -
+
+```
+npx drizzle-kit generate
+npx drizzle-kit migrate
 ```
