@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 // Postgres schema (for dev and prod)
 export const pgDimensions = pgTable('dimensions', {
