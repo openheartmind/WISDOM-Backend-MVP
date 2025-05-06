@@ -49,7 +49,7 @@ export class InstanceService {
         title: pgInstances.title,
         description: pgInstances.description,
         memberships: {
-          roleId: pgMemberships.role,
+          role: pgMemberships.role,
         },
       })
       .from(pgInstances)
