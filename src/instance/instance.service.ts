@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
-import { pgInstances, pgMemberships } from '../database/schema';
+import { pgInstances, pgMemberships, users } from '../database/schema';
 import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from 'src/database/database.service';
 import { AddMemberDto } from './dto/add-member.dto';
@@ -39,7 +39,6 @@ export class InstanceService {
       .from(pgInstances)
       .leftJoin(pgMemberships, eq(pgInstances.id, pgMemberships.instanceId))
       .where(eq(pgMemberships.userId, userId));
-    //return await this.databaseService.db.query.instances.findMany();
   }
 
   async findOne(id: string, userId: string) {
@@ -131,5 +130,27 @@ export class InstanceService {
       .insert(pgMemberships)
       .values(dto)
       .returning();
+  }
+
+  async getMembers(id: string, userId: string) {
+    const userMembership =
+      await this.databaseService.db.query.memberships.findFirst({
+        where: and(
+          eq(pgMemberships.userId, userId),
+          eq(pgMemberships.instanceId, id),
+        ),
+      });
+    if (!userMembership) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+    return await this.databaseService.db
+      .select({
+        id: pgMemberships.id,
+        role: pgMemberships.role,
+        user: users.displayName,
+      })
+      .from(pgMemberships)
+      .leftJoin(users, eq(pgMemberships.userId, users.authId))
+      .where(eq(pgMemberships.instanceId, id));
   }
 }

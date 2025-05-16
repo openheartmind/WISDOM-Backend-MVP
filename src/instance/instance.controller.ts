@@ -89,4 +89,11 @@ export class InstanceController {
     addMemberDto.instanceId = id;
     return this.instanceService.addMember(user.authId, addMemberDto);
   }
+
+  @Get(':id/members')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  getMembers(@Param('id') id: string, @GetUser() user: User) {
+    return this.instanceService.getMembers(id, user.authId);
+  }
 }

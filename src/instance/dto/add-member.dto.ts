@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { roles } from '../instance.roles';
 import { IsEnum } from 'class-validator';
 
@@ -10,7 +10,6 @@ export class AddMemberDto {
     enum: roles,
   })
   role: string;
-  @ApiPropertyOptional()
   instanceId: string;
   @ApiProperty({
     example: '',
