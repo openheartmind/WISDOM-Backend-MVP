@@ -4,27 +4,26 @@ import {
   HttpStatus,
   Post,
   Get,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
   ApiResponse,
-  ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthenticateResponseDto } from './dto/authenticate.dto';
 import { AuthService } from './auth.service';
-import { SignUpDto, SignUpResponseDto } from './dto/sign-up.dto';
+import { SignUpDto, SignUpResponseDto, SignUpConfirmDto } from './dto/sign-up.dto';
 import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
+import { SuccessDto } from 'src/dto/success.dto';
 import { GetUser } from './decorator/get-user.decorator';
 import { User } from 'src/database/schema';
 import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('/sign-up')
   @ApiOperation({ summary: 'Sign up user using email and password' })
@@ -35,17 +34,13 @@ export class AuthController {
     return await this.authService.signUp(signUpDto);
   }
 
-  // This is a HTTP GET because we expect the user to click on a link to get here
-  @Get('/sign-up/confirm')
+  @Post('/sign-up/confirm')
   @ApiOperation({ summary: 'Confirm new user email and sign in user' })
-  @ApiQuery({
-    name: 'hashed_token',
-    description: 'Email confirmation token hash',
-  })
+  @ApiBody({ type: SignUpConfirmDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
-  @ApiResponse({ status: HttpStatus.OK, type: AuthenticateResponseDto })
-  async confirmSignUp(@Query('hashed_token') hash: string) {
-    return await this.authService.confirmSignUp(hash);
+  @ApiResponse({ status: HttpStatus.OK, type: SuccessDto })
+  async confirmSignUp(@Body() payload: SignUpConfirmDto) {
+    return await this.authService.confirmSignUp(payload.hashedToken);
   }
 
   @Post('/sign-in')
