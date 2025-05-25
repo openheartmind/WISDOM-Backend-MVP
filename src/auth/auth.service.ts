@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { DatabaseService } from 'src/database/database.service';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { users } from 'src/database/schema';
 import { SignUpDto, SignUpResponseDto } from './dto/sign-up.dto';
 import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
@@ -14,6 +14,7 @@ import { MailerService } from 'src/mailer/mailer.service';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from 'src/config/app-config';
+import { ProfileDto, ProfileUpdateResponseDto } from './dto/profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -109,6 +110,47 @@ export class AuthService {
     return {
       success: true,
     };
+  }
+
+  async profileUpdate(
+    profileDto: ProfileDto,
+  ): Promise<ProfileUpdateResponseDto> {
+    try {
+      // TODO: VERIFY AUTH USER === profileDto.email
+      // TODO: VERIFY ALL FIELDS ARE VALID (currently accepting ANY list of fields)
+      const user = await this.databaseService.db.query.users.findFirst({
+        where: eq(users.email, profileDto.email),
+      });
+      if (!user) {
+        throw new Error(
+          `User with the email "${profileDto.email}" could not be found`,
+        );
+      }
+
+      const res = await this.databaseService.db
+        .update(users)
+        .set(profileDto)
+        .where(
+          and(eq(users.authId, user.authId), eq(users.email, profileDto.email)),
+        )
+        .returning();
+
+      const newObj = {};
+      Object.keys(profileDto).reduce((val, key) => {
+        if (key in user) newObj[key] = user[key];
+        return val;
+      }, {});
+
+      return {
+        success: JSON.stringify(newObj) === JSON.stringify(profileDto),
+      };
+    } catch (error) {
+      console.error('Error: ', error);
+
+      return {
+        success: false,
+      };
+    }
   }
 
   async confirmSignUp(token_hash: string) {

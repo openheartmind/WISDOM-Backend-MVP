@@ -21,6 +21,7 @@ import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
 import { GetUser } from './decorator/get-user.decorator';
 import { User } from 'src/database/schema';
 import { AuthGuard } from './auth.guard';
+import { ProfileDto, ProfileUpdateResponseDto } from './dto/profile.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -33,6 +34,19 @@ export class AuthController {
   @ApiBody({ type: SignUpDto })
   async signUp(@Body() signUpDto: SignUpDto): Promise<SignUpResponseDto> {
     return await this.authService.signUp(signUpDto);
+  }
+
+  @Post('/profile-update')
+  @ApiOperation({ summary: 'Update user details' })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @ApiResponse({ status: HttpStatus.OK, type: AuthenticateResponseDto })
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: ProfileDto })
+  async profileUpdate(
+    @Body() profileDto: ProfileDto,
+  ): Promise<ProfileUpdateResponseDto> {
+    return await this.authService.profileUpdate(profileDto);
   }
 
   // This is a HTTP GET because we expect the user to click on a link to get here
