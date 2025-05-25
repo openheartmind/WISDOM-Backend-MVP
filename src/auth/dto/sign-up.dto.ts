@@ -16,13 +16,25 @@ export class SignUpDto {
   @IsNotEmpty()
   readonly password: string;
 
-  @ApiPropertyOptional({
-    example: 'Dipanshu',
-    description: 'The full name of the user',
-  })
+  @ApiProperty({ example: 'Johnny', description: 'Display name' })
+  @IsString()
+  @IsNotEmpty()
+  readonly displayName: string;
+  
+  @ApiPropertyOptional({ example: 'John Doe', description: 'Full name' })
   @IsOptional()
   @IsString()
-  readonly displayName?: string;
+  readonly fullName?: string;
+
+  @ApiPropertyOptional({ example: '0400000000', description: 'Phone number' })
+  @IsOptional()
+  @IsString()
+  readonly phone?: string;
+
+  @ApiPropertyOptional({ example: 'Australia', description: 'Country' })
+  @IsOptional()
+  @IsString()
+  readonly country?: string;
 }
 
 export class SignUpResponseDto extends SuccessDto {}

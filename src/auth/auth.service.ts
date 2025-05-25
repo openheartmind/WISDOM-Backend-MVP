@@ -21,8 +21,8 @@ export class AuthService {
     private supabaseService: SupabaseService,
     private databaseService: DatabaseService,
     private mailerService: MailerService,
-    private config: ConfigService<EnvironmentVariables>
-  ) { }
+    private config: ConfigService<EnvironmentVariables>,
+  ) {}
 
   async signIn(signInDto: SignInDto): Promise<SignInResponseDto> {
     const supabase = this.supabaseService.getClient();
@@ -84,6 +84,9 @@ export class AuthService {
     await this.databaseService.db.insert(users).values({
       email: signUpDto.email,
       displayName: signUpDto.displayName,
+      ...(signUpDto.fullName && { fullName: signUpDto.fullName }),
+      ...(signUpDto.phone && { phone: signUpDto.phone }),
+      ...(signUpDto.country && { country: signUpDto.country }),
 
       authId: authData.user.id,
     });
@@ -96,8 +99,8 @@ export class AuthService {
 
       if (rejected.length > 0) {
         throw new Error(`Email "${rejected[0]}" was rejected`, {
-          cause: rejectedErrors
-        })
+          cause: rejectedErrors,
+        });
       }
     } catch (error) {
       console.error('email error', error);
@@ -129,7 +132,9 @@ export class AuthService {
   }
 
   private async emailSignUpConfirmation(email: string, displayName?: string) {
-    const confirmBaseURL = this.config.getOrThrow<string>('SIGNUP_CONFIRM_BASE_URL');
+    const confirmBaseURL = this.config.getOrThrow<string>(
+      'SIGNUP_CONFIRM_BASE_URL',
+    );
     const supabase = this.supabaseService.getServiceClient();
     const { data, error } = await supabase.auth.admin.generateLink({
       email,
