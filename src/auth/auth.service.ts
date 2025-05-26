@@ -123,7 +123,6 @@ export class AuthService {
         throw new ForbiddenException('Could not recognize the user');
       }
 
-      // TODO: VERIFY ALL FIELDS ARE VALID (currently accepting ANY list of fields)
       const user = await this.databaseService.db.query.users.findFirst({
         where: and(eq(users.authId, authId), eq(users.email, profileDto.email)),
       });
