@@ -10,8 +10,8 @@ import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from 'src/config/app-config';
 
 import { DatabaseService } from 'src/database/database.service';
-import { users } from 'src/database/schema';
-import { eq } from 'drizzle-orm';
+import { memberships, users } from 'src/database/schema';
+import { and, eq } from 'drizzle-orm';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -42,7 +42,7 @@ export class AuthGuard implements CanActivate {
     return true;
   }
   private async verifyToken(token: string, secret: string) {
-    const decoded = (verify(token, secret)) as JwtPayload;
+    const decoded = verify(token, secret) as JwtPayload;
     const userId = decoded.sub;
     if (!userId || !decoded.exp || !decoded.iat) {
       throw new UnauthorizedException('Invalid token');
@@ -63,5 +63,34 @@ export class AuthGuard implements CanActivate {
       iat: decoded.iat,
       ...decoded,
     };
+  }
+}
+
+@Injectable()
+export class RoleGuard implements CanActivate {
+  constructor(
+    private readonly db: DatabaseService,
+    private configService: ConfigService<EnvironmentVariables>,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const instanceId = request.params['id'];
+    const user = request.user;
+    if (!user) {
+      throw new UnauthorizedException('No authenticated user');
+    }
+    if (!instanceId) {
+      throw new UnauthorizedException('No instance id');
+    }
+    const membership = await this.db.db.query.memberships.findFirst({
+      where: and(
+        eq(memberships.userId, user.authId),
+        eq(memberships.instanceId, instanceId),
+      ),
+    });
+    console.log(user.authId);
+    request.role = membership?.role;
+    return true;
   }
 }

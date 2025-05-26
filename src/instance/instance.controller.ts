@@ -8,13 +8,14 @@ import {
   Delete,
   UseGuards,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InstanceService } from './instance.service';
 import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
 import { User } from 'src/database/schema';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard, RoleGuard } from 'src/auth/auth.guard';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -22,6 +23,8 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { AddMemberDto } from './dto/add-member.dto';
+import { roles } from './instance.roles';
+import { GetRole } from 'src/auth/decorator/get-role.decorator';
 
 @Controller('instance')
 export class InstanceController {
@@ -35,7 +38,6 @@ export class InstanceController {
   })
   @ApiBody({ type: CreateInstanceDto })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @UseGuards(AuthGuard)
   create(@Body() createInstanceDto: CreateInstanceDto, @GetUser() user: User) {
     createInstanceDto.createdBy = user.authId;
@@ -53,7 +55,7 @@ export class InstanceController {
   @Get(':id')
   @ApiOperation({ summary: 'Display instance by id' })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   findOne(@Param('id') id: string, @GetUser() user: User) {
     return this.instanceService.findOne(id, user.authId);
   }
@@ -61,12 +63,16 @@ export class InstanceController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update instance by id' })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   update(
     @Param('id') id: string,
     @Body() updateInstanceDto: UpdateInstanceDto,
     @GetUser() user: User,
+    @GetRole() role: roles,
   ) {
+    if (role !== 'Manager') {
+      throw new UnauthorizedException('Not authorized to update');
+    }
     return this.instanceService.update(id, updateInstanceDto, user.authId);
   }
 
