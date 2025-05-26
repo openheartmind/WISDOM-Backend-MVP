@@ -6,6 +6,7 @@ import {
   Get,
   Query,
   UseGuards,
+  Headers,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -45,8 +46,9 @@ export class AuthController {
   @ApiBody({ type: ProfileDto })
   async profileUpdate(
     @Body() profileDto: ProfileDto,
+    @GetUser() user: User,
   ): Promise<ProfileUpdateResponseDto> {
-    return await this.authService.profileUpdate(profileDto);
+    return await this.authService.profileUpdate(profileDto, user.authId);
   }
 
   // This is a HTTP GET because we expect the user to click on a link to get here

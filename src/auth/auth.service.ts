@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   HttpStatus,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { DatabaseService } from 'src/database/database.service';
@@ -114,16 +115,21 @@ export class AuthService {
 
   async profileUpdate(
     profileDto: ProfileDto,
+    authId: string | null = null,
   ): Promise<ProfileUpdateResponseDto> {
     try {
-      // TODO: VERIFY AUTH USER === profileDto.email
+      const supabase = this.supabaseService.getClient();
+      if (!authId) {
+        throw new ForbiddenException('Could not recognize the user');
+      }
+
       // TODO: VERIFY ALL FIELDS ARE VALID (currently accepting ANY list of fields)
       const user = await this.databaseService.db.query.users.findFirst({
-        where: eq(users.email, profileDto.email),
+        where: and(eq(users.authId, authId), eq(users.email, profileDto.email)),
       });
       if (!user) {
         throw new Error(
-          `User with the email "${profileDto.email}" could not be found`,
+          `Could not match user id ${profileDto.email} with the request`,
         );
       }
 
@@ -137,7 +143,7 @@ export class AuthService {
 
       const newObj = {};
       Object.keys(profileDto).reduce((val, key) => {
-        if (key in user) newObj[key] = user[key];
+        if (key in user && user[key]) newObj[key] = user[key];
         return val;
       }, {});
 
