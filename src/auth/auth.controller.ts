@@ -21,6 +21,7 @@ import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
 import { GetUser } from './decorator/get-user.decorator';
 import { User } from 'src/database/schema';
 import { AuthGuard } from './auth.guard';
+import { DecodeInviteResponseDto } from './dto/decode-invite.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -71,16 +72,22 @@ export class AuthController {
   }
 
   @Get('/invite/decode')
-  @ApiOperation({ summary: 'Decode invite token' })
+  @ApiOperation({ summary: 'Decode and verify an invite token' })
   @ApiQuery({
     name: 'token',
-    description: 'Invite token',
+    description: 'JWT invite token containing the invited user\'s email',
+    required: true,
   })
-  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
-  @ApiResponse({ status: HttpStatus.OK, type: AuthenticateResponseDto })
-  async decodeInviteToken(@Query('token') token: string) {
-    // Throws if invalid/expired
-    const payload = this.authService.verifyInviteToken(token);
-    return payload;
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'Token successfully decoded',
+    type: DecodeInviteResponseDto 
+  })
+  @ApiResponse({ 
+    status: HttpStatus.BAD_REQUEST, 
+    description: 'Invalid or expired token' 
+  })
+  async decodeInviteToken(@Query('token') token: string): Promise<DecodeInviteResponseDto> {
+    return await this.authService.verifyInviteToken(token);
   }
 }

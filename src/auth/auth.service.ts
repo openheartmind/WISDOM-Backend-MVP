@@ -248,6 +248,18 @@ export class AuthService {
   }
 
   public verifyInviteToken(token: string) {
-    return jwt.verify(token, this.config.getOrThrow<string>('INVITE_SECRET'));
+    try {
+      const decoded = jwt.verify(token, this.config.getOrThrow<string>('INVITE_SECRET')) as { email: string; iat: number; exp: number };
+      return {
+        email: decoded.email,
+        expiresAt: new Date(decoded.exp * 1000).toISOString()
+      };
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Invalid or expired invite token',
+        details: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
   }
 }
