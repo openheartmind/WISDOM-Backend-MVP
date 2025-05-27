@@ -14,7 +14,12 @@ import { MailerService } from 'src/mailer/mailer.service';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from 'src/config/app-config';
-import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  colors,
+  animals,
+} from 'unique-names-generator';
 import jwt from 'jsonwebtoken';
 
 @Injectable()
@@ -23,8 +28,8 @@ export class AuthService {
     private supabaseService: SupabaseService,
     private databaseService: DatabaseService,
     private mailerService: MailerService,
-    private config: ConfigService<EnvironmentVariables>
-  ) { }
+    private config: ConfigService<EnvironmentVariables>,
+  ) {}
 
   async signIn(signInDto: SignInDto): Promise<SignInResponseDto> {
     const supabase = this.supabaseService.getClient();
@@ -96,23 +101,23 @@ export class AuthService {
       });
     }
 
-    
     //If the user is missing their authID, continue with sign up
     if (user && !user.authId) {
-      await this.databaseService.db.update(users).set({
-        authId: authData.user.id,
-        displayName: signUpDto.displayName,
-      }).where(eq(users.email, signUpDto.email));
+      await this.databaseService.db
+        .update(users)
+        .set({
+          authId: authData.user.id,
+          displayName: signUpDto.displayName,
+        })
+        .where(eq(users.email, signUpDto.email));
     } else {
       await this.databaseService.db.insert(users).values({
         email: signUpDto.email,
         displayName: signUpDto.displayName,
-  
+
         authId: authData.user.id,
       });
     }
-
-    
 
     try {
       const { rejected, rejectedErrors } = await this.emailSignUpConfirmation(
@@ -122,8 +127,8 @@ export class AuthService {
 
       if (rejected.length > 0) {
         throw new Error(`Email "${rejected[0]}" was rejected`, {
-          cause: rejectedErrors
-        })
+          cause: rejectedErrors,
+        });
       }
     } catch (error) {
       console.error('email error', error);
@@ -155,7 +160,9 @@ export class AuthService {
   }
 
   private async emailSignUpConfirmation(email: string, displayName?: string) {
-    const confirmBaseURL = this.config.getOrThrow<string>('SIGNUP_CONFIRM_BASE_URL');
+    const confirmBaseURL = this.config.getOrThrow<string>(
+      'SIGNUP_CONFIRM_BASE_URL',
+    );
     const supabase = this.supabaseService.getServiceClient();
     const { data, error } = await supabase.auth.admin.generateLink({
       email,
@@ -196,11 +203,11 @@ export class AuthService {
   async inviteUser(email: string, instanceId?: string, inviterName?: string) {
     const supabase = this.supabaseService.getServiceClient();
     const signupURL = this.config.getOrThrow<string>('SIGNUP_URL');
-    
+
     //Create the user in the database, and send an email to the user to begin sign up.
     //Generate a random display name for now
     const shortName: string = uniqueNamesGenerator({
-      dictionaries: [colors, adjectives, animals]
+      dictionaries: [colors, adjectives, animals],
     });
 
     await this.databaseService.db.insert(users).values({
@@ -209,9 +216,9 @@ export class AuthService {
     });
 
     const instance = await this.databaseService.db.query.instances.findFirst({
-      where: eq(instances.id, instanceId),
+      where: eq(instances.id, instanceId || ''),
     });
-    
+
     //send email via mailerService
     const msgInfo = await this.mailerService.send({
       template: join(__dirname, 'email', 'invite'),
@@ -224,7 +231,6 @@ export class AuthService {
         signUpURL: this.generateInviteLink(email),
       },
     });
-
   }
 
   private generateInviteLink(email: string) {
@@ -236,7 +242,9 @@ export class AuthService {
 
   private generateInviteToken(email: string) {
     const payload = { email };
-    return jwt.sign(payload, this.config.getOrThrow<string>('INVITE_SECRET'), { expiresIn: '7d' });
+    return jwt.sign(payload, this.config.getOrThrow<string>('INVITE_SECRET'), {
+      expiresIn: '7d',
+    });
   }
 
   public verifyInviteToken(token: string) {
