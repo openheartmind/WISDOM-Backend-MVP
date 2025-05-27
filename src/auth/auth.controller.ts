@@ -69,4 +69,18 @@ export class AuthController {
   async me(@GetUser() user: User) {
     return user;
   }
+
+  @Get('/invite/decode')
+  @ApiOperation({ summary: 'Decode invite token' })
+  @ApiQuery({
+    name: 'token',
+    description: 'Invite token',
+  })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @ApiResponse({ status: HttpStatus.OK, type: AuthenticateResponseDto })
+  async decodeInviteToken(@Query('token') token: string) {
+    // Throws if invalid/expired
+    const payload = this.authService.verifyInviteToken(token);
+    return payload;
+  }
 }

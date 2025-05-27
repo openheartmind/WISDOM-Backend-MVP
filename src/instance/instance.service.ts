@@ -1,15 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
-import { pgInstances, pgMemberships } from '../database/schema';
+import { pgInstances, pgMemberships, users } from '../database/schema';
 import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from 'src/database/database.service';
 import { AddMemberDto } from './dto/add-member.dto';
 import { roles } from './instance.roles';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class InstanceService {
-  constructor(private databaseService: DatabaseService) {}
+  constructor(
+    private databaseService: DatabaseService,
+    private readonly authService: AuthService,
+  ) {}
 
   async create(instance: CreateInstanceDto) {
     const [created] = await this.databaseService.db
@@ -96,6 +100,12 @@ export class InstanceService {
       .returning();
   }
 
+  /**
+   * Add a member to an instance
+   * @param userId The id of the user adding the member
+   * @param dto The dto containing the role, instanceId, and userId of the member to be added
+   * @returns The membership record of the added member
+   */
   async addMember(userId: string, dto: AddMemberDto) {
     const userMembership =
       await this.databaseService.db.query.memberships.findFirst({
@@ -131,5 +141,27 @@ export class InstanceService {
       .insert(pgMemberships)
       .values(dto)
       .returning();
+  }
+
+  async addMemberByEmail(userId: string, email: string, instanceId: string, role: string) {
+    const user = await this.databaseService.db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+    if (!user) {
+      const inviter = await this.databaseService.db.query.users.findFirst({
+        where: eq(users.id, userId),
+      });
+      //Invite that user to the application
+      await this.authService.inviteUser(email, instanceId, inviter?.displayName ?? 'Wisdom');
+      //Associate that user with the instance
+      const newUser = await this.databaseService.db.query.users.findFirst({
+        where: eq(users.email, email),
+      });
+      if (!newUser) {
+        throw new HttpException('Failed to invite user', HttpStatus.BAD_REQUEST);
+      }
+      return this.addMember(newUser.id, { instanceId, role, userId: newUser.id });
+    }
+    return this.addMember(user.id, { instanceId, role, userId: user.id });
   }
 }
