@@ -5,7 +5,7 @@ import { instances } from './instances';
 // Postgres schema (for dev and prod)
 export const pgMemberships = pgTable('memberships', {
   id: uuid().primaryKey().defaultRandom(),
-  userId: text('user_id').references(() => users.authId),
+  userId: uuid('user_id').references(() => users.id),
   instanceId: uuid('instance_id').references(() => instances.id),
   role: text('role'),
   createdAt: timestamp('created_at').defaultNow(),
