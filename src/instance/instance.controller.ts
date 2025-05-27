@@ -22,6 +22,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { AddMemberDto } from './dto/add-member.dto';
+import { AddMemberByEmailDto } from './dto/add-member-by-email.dto';
 
 @Controller('instance')
 export class InstanceController {
@@ -88,5 +89,27 @@ export class InstanceController {
   ) {
     addMemberDto.instanceId = id;
     return this.instanceService.addMember(user.id, addMemberDto);
+  }
+
+  @Post(':id/members/email')
+  @ApiOperation({ summary: 'Add a member to an instance by email' })
+  @ApiBody({ type: AddMemberByEmailDto })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  addMemberByEmail(
+    @Param('id') instanceId: string,
+    @Body() addMemberByEmailDto: AddMemberByEmailDto,
+    @GetUser() user: User,
+  ) {
+    return this.instanceService.addMemberByEmail(
+      user.id, 
+      addMemberByEmailDto.email, 
+      instanceId, 
+      addMemberByEmailDto.role
+    );
   }
 }
