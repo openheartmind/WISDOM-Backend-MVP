@@ -108,12 +108,19 @@ export class AuthService {
         .set({
           authId: authData.user.id,
           displayName: signUpDto.displayName,
+          ...(signUpDto.fullName && { fullName: signUpDto.fullName }),
+          ...(signUpDto.phone && { phone: signUpDto.phone }),
+          ...(signUpDto.country && { country: signUpDto.country }),
         })
         .where(eq(users.email, signUpDto.email));
     } else {
       await this.databaseService.db.insert(users).values({
         email: signUpDto.email,
         displayName: signUpDto.displayName,
+        
+        ...(signUpDto.fullName && { fullName: signUpDto.fullName }),
+        ...(signUpDto.phone && { phone: signUpDto.phone }),
+        ...(signUpDto.country && { country: signUpDto.country }),
 
         authId: authData.user.id,
       });
