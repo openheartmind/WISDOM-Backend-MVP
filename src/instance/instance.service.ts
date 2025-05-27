@@ -145,9 +145,9 @@ export class InstanceService {
     }
     return await this.databaseService.db
       .select({
-        id: pgMemberships.id,
+        id: pgMemberships.userId,
         role: pgMemberships.role,
-        user: users.displayName,
+        username: users.displayName,
       })
       .from(pgMemberships)
       .leftJoin(users, eq(pgMemberships.userId, users.authId))
