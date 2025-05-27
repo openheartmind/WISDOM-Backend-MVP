@@ -32,7 +32,6 @@ npx supabase db reset
 After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again. Best to run the generate command as well to make sure all the latest schema changes are present -
 
 ```
-npx drizzle-kit generate
 npx drizzle-kit migrate
 ```
 
