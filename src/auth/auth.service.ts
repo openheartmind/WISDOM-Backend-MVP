@@ -146,7 +146,7 @@ export class AuthService {
 
     const { hashed_token } = data.properties;
     const confirmURL = new URL(confirmBaseURL);
-    confirmURL.search = `hashed_token=${hashed_token}`;
+    confirmURL.search = `token=${hashed_token}`;
 
     const msgInfo = await this.mailerService.send({
       template: join(__dirname, 'email', 'confirm'),

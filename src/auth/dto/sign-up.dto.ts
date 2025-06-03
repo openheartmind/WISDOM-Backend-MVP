@@ -31,7 +31,7 @@ export class SignUpConfirmDto {
   @ApiProperty({ description: 'Token received from confrimation email' })
   @IsString()
   @IsNotEmpty()
-  readonly hashedToken: string;
+  readonly token: string;
 
   // support OTP?
 }
