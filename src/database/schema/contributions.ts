@@ -10,7 +10,7 @@ export const contributions = pgTable('contributions', {
   content: text('content').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
-  contributorId: text('contributor_id').references(() => users.id),
+  contributorId: uuid('contributor_id').references(() => users.id),
   instanceId: uuid('instance_id').notNull().references(() => instances.id, { onDelete: 'cascade' }),
 });
 

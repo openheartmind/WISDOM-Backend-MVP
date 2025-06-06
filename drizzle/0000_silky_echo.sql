@@ -44,7 +44,7 @@ CREATE TABLE "contributions" (
 	"content" text NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
-	"contributor_id" text,
+	"contributor_id" uuid,
 	"instance_id" uuid NOT NULL
 );
 --> statement-breakpoint

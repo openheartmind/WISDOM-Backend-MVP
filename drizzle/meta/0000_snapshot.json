@@ -323,7 +323,7 @@
         },
         "contributor_id": {
           "name": "contributor_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
