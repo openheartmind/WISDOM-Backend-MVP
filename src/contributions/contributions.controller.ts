@@ -21,7 +21,7 @@ import {
     @ApiBearerAuth()
     @ApiResponse({ status: 201, description: 'Contribution created successfully' })
     create(@Body() createContributionDto: CreateContributionDto, @Req() req) {
-      const userId = req.user.authId; // Use authId from the user object
+      const userId = req.user.id; // Use authId from the user object
       return this.contributionsService.create(createContributionDto, userId);
     }
   
@@ -53,7 +53,7 @@ import {
       @Body() updateContributionDto: UpdateContributionDto,
       @Req() req,
     ) {
-      const userId = req.user.authId; // Use authId from the user object
+      const userId = req.user.id; // Use authId from the user object
       return this.contributionsService.update(id, updateContributionDto, userId);
     }
   
@@ -64,7 +64,7 @@ import {
     @ApiResponse({ status: 200, description: 'Contribution deleted successfully' })
     @ApiResponse({ status: 404, description: 'Contribution not found' })
     remove(@Param('id') id: string, @Req() req) {
-      const userId = req.user.authId; // Use authId from the user object
+      const userId = req.user.id; // Use authId from the user object
       return this.contributionsService.remove(id, userId);
     }
   }

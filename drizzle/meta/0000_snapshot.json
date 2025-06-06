@@ -1,5 +1,5 @@
 {
-  "id": "330660d4-fb6e-468e-b29b-ba13bafc1fb7",
+  "id": "38653b85-327f-4b83-b0f3-9784939d7b12",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -336,15 +336,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "contributions_contributor_id_users_authId_fk": {
-          "name": "contributions_contributor_id_users_authId_fk",
+        "contributions_contributor_id_users_id_fk": {
+          "name": "contributions_contributor_id_users_id_fk",
           "tableFrom": "contributions",
           "tableTo": "users",
           "columnsFrom": [
             "contributor_id"
           ],
           "columnsTo": [
-            "authId"
+            "id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
