@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1741255533736,
-      "tag": "0000_lean_franklin_storm",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1741943368881,
-      "tag": "0001_omniscient_mad_thinker",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1744102115895,
-      "tag": "0002_optimal_captain_flint",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1745964948674,
-      "tag": "0003_wonderful_violations",
+      "when": 1749194624042,
+      "tag": "0000_silky_echo",
       "breakpoints": true
     }
   ]

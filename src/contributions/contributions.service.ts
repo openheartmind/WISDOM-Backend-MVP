@@ -32,7 +32,7 @@ export class ContributionsService {
         instance: true,
         contributor: {
           columns: {
-            authId: true,
+            id: true,
             displayName: true,
             email: false,
             createdAt: false,
@@ -50,7 +50,7 @@ export class ContributionsService {
         instance: true,
         contributor: {
           columns: {
-            authId: true,
+            id: true,
             displayName: true,
             email: false,
             createdAt: false,
@@ -102,7 +102,7 @@ export class ContributionsService {
       with: {
         contributor: {
           columns: {
-            authId: true,
+            id: true,
             displayName: true,
             email: false,
             createdAt: false,

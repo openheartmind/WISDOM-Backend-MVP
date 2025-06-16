@@ -68,6 +68,12 @@ export class EnvironmentVariables {
     require_tld: false,
   })
   SIGNUP_CONFIRM_BASE_URL: string;
+
+  @IsString()
+  SIGNUP_URL: string;
+
+  @IsString()
+  INVITE_SECRET: string;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -102,4 +108,6 @@ export default () =>
       : false,
     SMTP_FROM: process.env.SMTP_FROM || 'test@example.com',
     SIGNUP_CONFIRM_BASE_URL: process.env.SIGNUP_CONFIRM_BASE_URL,
+    SIGNUP_URL: process.env.SIGNUP_URL,
+    INVITE_SECRET: process.env.INVITE_SECRET,
   }) as EnvironmentVariables;
