@@ -21,7 +21,7 @@ export const contributionsRelations = relations(contributions, ({ one }) => ({
   }),
   contributor: one(users, {
     fields: [contributions.contributorId],
-    references: [users.authId],
+    references: [users.id],
   }),
 }));
 
