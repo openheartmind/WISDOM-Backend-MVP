@@ -5,12 +5,14 @@ import {
   Post,
   Get,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { AuthenticateResponseDto } from './dto/authenticate.dto';
 import { AuthService } from './auth.service';
