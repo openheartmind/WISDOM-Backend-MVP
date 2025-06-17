@@ -111,7 +111,7 @@ export class InstanceService {
     const instance = await this.databaseService.db.query.instances.findFirst({
       where: eq(pgInstances.id, dto.instanceId),
     });
-    
+
     // Check if user is owner or has manager role
     const userMembership =
       await this.databaseService.db.query.memberships.findFirst({
@@ -120,11 +120,14 @@ export class InstanceService {
           eq(pgMemberships.instanceId, dto.instanceId),
         ),
       });
-    
-    if (instance?.createdBy !== userId && userMembership?.role !== roles.MANAGER) {
+
+    if (
+      instance?.createdBy !== userId &&
+      userMembership?.role !== roles.MANAGER
+    ) {
       throw new HttpException(
         'Forbidden: Only instance owners and managers can add members',
-        HttpStatus.FORBIDDEN
+        HttpStatus.FORBIDDEN,
       );
     }
     const membership =
@@ -153,12 +156,28 @@ export class InstanceService {
       .returning();
   }
 
-  async addMemberByEmail(userId: string, email: string, instanceId: string, role: string) {
+  async getRole(instanceId: string, userId: string) {
+    const membership =
+      await this.databaseService.db.query.memberships.findFirst({
+        where: and(
+          eq(pgMemberships.userId, userId),
+          eq(pgMemberships.instanceId, instanceId),
+        ),
+      });
+    return membership?.role;
+  }
+
+  async addMemberByEmail(
+    userId: string,
+    email: string,
+    instanceId: string,
+    role: string,
+  ) {
     // First check if user is the instance owner
     const instance = await this.databaseService.db.query.instances.findFirst({
       where: eq(pgInstances.id, instanceId),
     });
-    
+
     // Check if user is owner or has manager role
     const userMembership =
       await this.databaseService.db.query.memberships.findFirst({
@@ -167,30 +186,40 @@ export class InstanceService {
           eq(pgMemberships.instanceId, instanceId),
         ),
       });
-    
-    if (instance?.createdBy !== userId && userMembership?.role !== roles.MANAGER) {
+
+    if (
+      instance?.createdBy !== userId &&
+      userMembership?.role !== roles.MANAGER
+    ) {
       throw new HttpException(
         `Forbidden: User does not have owner or manager permissions for instance ${instanceId}. Current role: ${userMembership?.role || 'none'}`,
-        HttpStatus.FORBIDDEN
+        HttpStatus.FORBIDDEN,
       );
     }
 
     const targetUser = await this.databaseService.db.query.users.findFirst({
       where: eq(users.email, email),
     });
-    
+
     if (!targetUser) {
       const inviter = await this.databaseService.db.query.users.findFirst({
         where: eq(users.id, userId),
       });
       //Invite that user to the application
-      await this.authService.inviteUser(email, instanceId, inviter?.displayName ?? 'Wisdom');
+      await this.authService.inviteUser(
+        email,
+        instanceId,
+        inviter?.displayName ?? 'Wisdom',
+      );
       //Associate that user with the instance
       const newUser = await this.databaseService.db.query.users.findFirst({
         where: eq(users.email, email),
       });
       if (!newUser) {
-        throw new HttpException('Failed to invite user', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'Failed to invite user',
+          HttpStatus.BAD_REQUEST,
+        );
       }
       return this.addMember(userId, { instanceId, role, userId: newUser.id });
     }

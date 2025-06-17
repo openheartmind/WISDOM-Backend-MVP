@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InstanceService } from './instance.service';
 import { CreateInstanceDto } from './dto/create-instance.dto';
@@ -23,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { AddMemberDto } from './dto/add-member.dto';
 import { AddMemberByEmailDto } from './dto/add-member-by-email.dto';
+import { roles } from './instance.roles';
 
 @Controller('instance')
 export class InstanceController {
@@ -82,12 +84,15 @@ export class InstanceController {
   @Post(':id/members')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  addMember(
+  async addMember(
     @Param('id') id: string,
     @Body() addMemberDto: AddMemberDto,
     @GetUser() user: User,
   ) {
     addMemberDto.instanceId = id;
+    if ((await this.instanceService.getRole(id, user.id)) !== roles.MANAGER) {
+      throw new UnauthorizedException('Not authorized');
+    }
     return this.instanceService.addMember(user.id, addMemberDto);
   }
 
@@ -106,10 +111,10 @@ export class InstanceController {
     @GetUser() user: User,
   ) {
     return this.instanceService.addMemberByEmail(
-      user.id, 
-      addMemberByEmailDto.email, 
-      instanceId, 
-      addMemberByEmailDto.role
+      user.id,
+      addMemberByEmailDto.email,
+      instanceId,
+      addMemberByEmailDto.role,
     );
   }
 }
