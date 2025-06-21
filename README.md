@@ -29,7 +29,7 @@ npx supabase init
 npx supabase db reset
 ```
 
-After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again. Best to run the generate command as well to make sure all the latest schema changes are present -
+After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again -
 
 ```
 npx drizzle-kit migrate
@@ -159,9 +159,8 @@ It's most likely that you have conflicts. The following command should resolve i
 npx supabase db reset
 ```
 
-After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again. Best to run the generate command as well to make sure all the latest schema changes are present -
+After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again -
 
 ```
-npx drizzle-kit generate
 npx drizzle-kit migrate
 ```
