@@ -1,15 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
-import { pgInstances, pgMemberships } from '../database/schema';
+import { pgInstances, pgMemberships, users } from '../database/schema';
 import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from 'src/database/database.service';
 import { AddMemberDto } from './dto/add-member.dto';
 import { roles } from './instance.roles';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class InstanceService {
-  constructor(private databaseService: DatabaseService) {}
+  constructor(
+    private databaseService: DatabaseService,
+    private readonly authService: AuthService,
+  ) {}
 
   async create(instance: CreateInstanceDto) {
     const [created] = await this.databaseService.db
@@ -96,7 +100,19 @@ export class InstanceService {
       .returning();
   }
 
+  /**
+   * Add a member to an instance
+   * @param userId The id of the user adding the member
+   * @param dto The dto containing the role, instanceId, and userId of the member to be added
+   * @returns The membership record of the added member
+   */
   async addMember(userId: string, dto: AddMemberDto) {
+    // First check if user is the instance owner
+    const instance = await this.databaseService.db.query.instances.findFirst({
+      where: eq(pgInstances.id, dto.instanceId),
+    });
+    
+    // Check if user is owner or has manager role
     const userMembership =
       await this.databaseService.db.query.memberships.findFirst({
         where: and(
@@ -104,8 +120,12 @@ export class InstanceService {
           eq(pgMemberships.instanceId, dto.instanceId),
         ),
       });
-    if (userMembership?.role !== roles.MANAGER) {
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    
+    if (instance?.createdBy !== userId && userMembership?.role !== roles.MANAGER) {
+      throw new HttpException(
+        'Forbidden: Only instance owners and managers can add members',
+        HttpStatus.FORBIDDEN
+      );
     }
     const membership =
       await this.databaseService.db.query.memberships.findFirst({
@@ -131,5 +151,49 @@ export class InstanceService {
       .insert(pgMemberships)
       .values(dto)
       .returning();
+  }
+
+  async addMemberByEmail(userId: string, email: string, instanceId: string, role: string) {
+    // First check if user is the instance owner
+    const instance = await this.databaseService.db.query.instances.findFirst({
+      where: eq(pgInstances.id, instanceId),
+    });
+    
+    // Check if user is owner or has manager role
+    const userMembership =
+      await this.databaseService.db.query.memberships.findFirst({
+        where: and(
+          eq(pgMemberships.userId, userId),
+          eq(pgMemberships.instanceId, instanceId),
+        ),
+      });
+    
+    if (instance?.createdBy !== userId && userMembership?.role !== roles.MANAGER) {
+      throw new HttpException(
+        `Forbidden: User does not have owner or manager permissions for instance ${instanceId}. Current role: ${userMembership?.role || 'none'}`,
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    const targetUser = await this.databaseService.db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+    
+    if (!targetUser) {
+      const inviter = await this.databaseService.db.query.users.findFirst({
+        where: eq(users.id, userId),
+      });
+      //Invite that user to the application
+      await this.authService.inviteUser(email, instanceId, inviter?.displayName ?? 'Wisdom');
+      //Associate that user with the instance
+      const newUser = await this.databaseService.db.query.users.findFirst({
+        where: eq(users.email, email),
+      });
+      if (!newUser) {
+        throw new HttpException('Failed to invite user', HttpStatus.BAD_REQUEST);
+      }
+      return this.addMember(userId, { instanceId, role, userId: newUser.id });
+    }
+    return this.addMember(userId, { instanceId, role, userId: targetUser.id });
   }
 }

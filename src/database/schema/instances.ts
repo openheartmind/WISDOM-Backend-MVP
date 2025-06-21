@@ -6,7 +6,7 @@ export const pgInstances = pgTable('instances', {
   id: uuid().primaryKey().defaultRandom(),
   title: text('title').notNull(),
   description: text('description').notNull(),
-  createdBy: text('created_by').references(() => users.authId),
+  createdBy: uuid('created_by').references(() => users.id),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

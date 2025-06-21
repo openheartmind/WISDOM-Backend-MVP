@@ -5,12 +5,14 @@ import {
   Post,
   Get,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { AuthenticateResponseDto } from './dto/authenticate.dto';
 import { AuthService } from './auth.service';
@@ -20,6 +22,7 @@ import { SuccessDto } from 'src/dto/success.dto';
 import { GetUser } from './decorator/get-user.decorator';
 import { User } from 'src/database/schema';
 import { AuthGuard } from './auth.guard';
+import { DecodeInviteResponseDto } from './dto/decode-invite.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -63,5 +66,25 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async me(@GetUser() user: User) {
     return user;
+  }
+
+  @Get('/invite/decode')
+  @ApiOperation({ summary: 'Decode and verify an invite token' })
+  @ApiQuery({
+    name: 'token',
+    description: 'JWT invite token containing the invited user\'s email',
+    required: true,
+  })
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'Token successfully decoded',
+    type: DecodeInviteResponseDto 
+  })
+  @ApiResponse({ 
+    status: HttpStatus.BAD_REQUEST, 
+    description: 'Invalid or expired token' 
+  })
+  async decodeInviteToken(@Query('token') token: string): Promise<DecodeInviteResponseDto> {
+    return await this.authService.verifyInviteToken(token);
   }
 }
