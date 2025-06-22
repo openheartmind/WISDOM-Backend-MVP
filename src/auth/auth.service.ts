@@ -170,14 +170,14 @@ export class AuthService {
       const res = await this.databaseService.db
         .update(users)
         .set(profileDto)
-        .where(
-          and(eq(users.authId, user.authId), eq(users.email, profileDto.email)),
-        )
+        .where(and(eq(users.authId, authId), eq(users.email, profileDto.email)))
         .returning();
 
       const newObj = {};
       Object.keys(profileDto).reduce((val, key) => {
-        if (key in user && user[key]) newObj[key] = user[key];
+        if (key in res[0] && res[0][key]) {
+          newObj[key] = profileDto[key] ? res[0][key] : undefined
+        };
         return val;
       }, {});
 
