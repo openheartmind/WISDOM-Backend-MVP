@@ -22,6 +22,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { AddMemberDto } from './dto/add-member.dto';
+import { AddMemberByEmailDto } from './dto/add-member-by-email.dto';
 
 @Controller('instance')
 export class InstanceController {
@@ -38,7 +39,7 @@ export class InstanceController {
   @UseGuards(AuthGuard)
   @UseGuards(AuthGuard)
   create(@Body() createInstanceDto: CreateInstanceDto, @GetUser() user: User) {
-    createInstanceDto.createdBy = user.authId;
+    createInstanceDto.createdBy = user.id;
     return this.instanceService.create(createInstanceDto);
   }
 
@@ -47,7 +48,7 @@ export class InstanceController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   findAll(@GetUser() user: User) {
-    return this.instanceService.findAll(user.authId);
+    return this.instanceService.findAll(user.id);
   }
 
   @Get(':id')
@@ -55,7 +56,7 @@ export class InstanceController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   findOne(@Param('id') id: string, @GetUser() user: User) {
-    return this.instanceService.findOne(id, user.authId);
+    return this.instanceService.findOne(id, user.id);
   }
 
   @Patch(':id')
@@ -67,7 +68,7 @@ export class InstanceController {
     @Body() updateInstanceDto: UpdateInstanceDto,
     @GetUser() user: User,
   ) {
-    return this.instanceService.update(id, updateInstanceDto, user.authId);
+    return this.instanceService.update(id, updateInstanceDto, user.id);
   }
 
   @Delete(':id')
@@ -75,7 +76,7 @@ export class InstanceController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   remove(@Param('id') id: string, @GetUser() user: User) {
-    return this.instanceService.remove(id, user.authId);
+    return this.instanceService.remove(id, user.id);
   }
 
   @Post(':id/members')
@@ -87,6 +88,28 @@ export class InstanceController {
     @GetUser() user: User,
   ) {
     addMemberDto.instanceId = id;
-    return this.instanceService.addMember(user.authId, addMemberDto);
+    return this.instanceService.addMember(user.id, addMemberDto);
+  }
+
+  @Post(':id/members/email')
+  @ApiOperation({ summary: 'Add a member to an instance by email' })
+  @ApiBody({ type: AddMemberByEmailDto })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  addMemberByEmail(
+    @Param('id') instanceId: string,
+    @Body() addMemberByEmailDto: AddMemberByEmailDto,
+    @GetUser() user: User,
+  ) {
+    return this.instanceService.addMemberByEmail(
+      user.id, 
+      addMemberByEmailDto.email, 
+      instanceId, 
+      addMemberByEmailDto.role
+    );
   }
 }

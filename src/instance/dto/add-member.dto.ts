@@ -14,7 +14,7 @@ export class AddMemberDto {
   instanceId: string;
   @ApiProperty({
     example: '',
-    description: 'The id of the user to be added to instance',
+    description: 'The UUID of the user to be added to instance',
   })
   userId: string;
 }

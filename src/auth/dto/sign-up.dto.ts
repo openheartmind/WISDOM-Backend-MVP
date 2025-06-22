@@ -20,7 +20,7 @@ export class SignUpDto {
   @IsString()
   @IsNotEmpty()
   readonly displayName: string;
-  
+
   @ApiPropertyOptional({ example: 'John Doe', description: 'Full name' })
   @IsOptional()
   @IsString()
@@ -38,3 +38,12 @@ export class SignUpDto {
 }
 
 export class SignUpResponseDto extends SuccessDto {}
+
+export class SignUpConfirmDto {
+  @ApiProperty({ description: 'Token received from confrimation email' })
+  @IsString()
+  @IsNotEmpty()
+  readonly hashedToken: string;
+
+  // support OTP?
+}
