@@ -3,11 +3,10 @@ import {
   ForbiddenException,
   HttpStatus,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { DatabaseService } from 'src/database/database.service';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { instances, users } from 'src/database/schema';
 import { SignUpDto, SignUpResponseDto } from './dto/sign-up.dto';
 import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
@@ -119,7 +118,7 @@ export class AuthService {
       await this.databaseService.db.insert(users).values({
         email: signUpDto.email,
         displayName: signUpDto.displayName,
-        
+
         ...(signUpDto.fullName && { fullName: signUpDto.fullName }),
         ...(signUpDto.phone && { phone: signUpDto.phone }),
         ...(signUpDto.country && { country: signUpDto.country }),
@@ -159,25 +158,24 @@ export class AuthService {
       }
 
       const user = await this.databaseService.db.query.users.findFirst({
-        where: and(eq(users.authId, authId), eq(users.email, profileDto.email)),
+        where: eq(users.authId, authId),
       });
       if (!user) {
         throw new Error(
           `Could not match user id ${profileDto.email} with the request`,
         );
       }
-
       const res = await this.databaseService.db
         .update(users)
         .set(profileDto)
-        .where(
-          and(eq(users.authId, user.authId), eq(users.email, profileDto.email)),
-        )
+        .where(eq(users.authId, authId))
         .returning();
 
       const newObj = {};
       Object.keys(profileDto).reduce((val, key) => {
-        if (key in user && user[key]) newObj[key] = user[key];
+        if (key in res[0] && res[0][key]) {
+          newObj[key] = profileDto[key] ? res[0][key] : undefined
+        };
         return val;
       }, {});
 
