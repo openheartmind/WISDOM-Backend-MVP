@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { InstanceService } from './instance.service';
 import { InstanceController } from './instance.controller';
 import { AuthModule } from 'src/auth/auth.module';
@@ -7,5 +7,6 @@ import { AuthModule } from 'src/auth/auth.module';
   controllers: [InstanceController],
   providers: [InstanceService],
   imports: [AuthModule],
+  exports: [InstanceService],
 })
 export class InstanceModule {}

@@ -57,28 +57,43 @@ export class InstanceController {
   @ApiOperation({ summary: 'Display instance by id' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  findOne(@Param('id') id: string, @GetUser() user: User) {
-    return this.instanceService.findOne(id, user.id);
+  async findOne(@Param('id') id: string, @GetUser() user: User) {
+    if (!(await this.instanceService.getRole(id, user.id))) {
+      throw new UnauthorizedException(
+        'Not Authorized: Not a member of instance',
+      );
+    }
+    return this.instanceService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update instance by id' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateInstanceDto: UpdateInstanceDto,
     @GetUser() user: User,
   ) {
-    return this.instanceService.update(id, updateInstanceDto, user.id);
+    if ((await this.instanceService.getRole(id, user.id)) !== roles.MANAGER) {
+      throw new UnauthorizedException(
+        'Not authorized: Not a manager of instance',
+      );
+    }
+    return this.instanceService.update(id, updateInstanceDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete instance by id' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  remove(@Param('id') id: string, @GetUser() user: User) {
-    return this.instanceService.remove(id, user.id);
+  async remove(@Param('id') id: string, @GetUser() user: User) {
+    if ((await this.instanceService.getRole(id, user.id)) !== roles.MANAGER) {
+      throw new UnauthorizedException(
+        'Not authorized: Not a manager of instance',
+      );
+    }
+    return this.instanceService.remove(id);
   }
 
   @Post(':id/members')
@@ -91,7 +106,9 @@ export class InstanceController {
   ) {
     addMemberDto.instanceId = id;
     if ((await this.instanceService.getRole(id, user.id)) !== roles.MANAGER) {
-      throw new UnauthorizedException('Not authorized');
+      throw new UnauthorizedException(
+        'Not authorized: Not a Manager of instance',
+      );
     }
     return this.instanceService.addMember(user.id, addMemberDto);
   }
@@ -105,11 +122,19 @@ export class InstanceController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  addMemberByEmail(
+  async addMemberByEmail(
     @Param('id') instanceId: string,
     @Body() addMemberByEmailDto: AddMemberByEmailDto,
     @GetUser() user: User,
   ) {
+    if (
+      (await this.instanceService.getRole(instanceId, user.id)) !==
+      roles.MANAGER
+    ) {
+      throw new UnauthorizedException(
+        'Not authorized: Not a manager of instance',
+      );
+    }
     return this.instanceService.addMemberByEmail(
       user.id,
       addMemberByEmailDto.email,

@@ -17,4 +17,4 @@ export class AddMemberByEmailDto {
     enum: roles,
   })
   role: string;
-} 
+}
