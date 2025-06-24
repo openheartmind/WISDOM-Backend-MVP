@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   HttpStatus,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { DatabaseService } from 'src/database/database.service';
@@ -32,44 +33,110 @@ export class AuthService {
   ) {}
 
   async signIn(signInDto: SignInDto): Promise<SignInResponseDto> {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: signInDto.email,
-      password: signInDto.password,
-    });
+    try {
+      const supabase = this.supabaseService.getClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: signInDto.email,
+        password: signInDto.password,
+      });
 
-    if (!data?.session?.access_token) {
+      // Check for Supabase authentication errors first
+      if (error) {
+        let errorMessage = 'Authentication failed';
+        let errorDetails = 'Unable to authenticate with the provided credentials';
+        let errorCode = 'AUTH_ERROR';
+
+        // Provide more specific error messages based on Supabase error types
+        switch (error.message) {
+          case 'Invalid login credentials':
+            // Keep this vague to prevent DoS attacks
+            errorMessage = 'Invalid credentials';
+            errorDetails = 'The email or password provided is incorrect. Please check your credentials and try again.';
+            errorCode = 'INVALID_CREDENTIALS';
+            break;
+          case 'Email not confirmed':
+            errorMessage = 'Email verification required';
+            errorDetails = 'Please check your email and click the verification link before signing in. If you haven\'t received the email, please check your spam folder or request a new verification email.';
+            errorCode = 'EMAIL_NOT_VERIFIED';
+            break;
+          case 'Too many requests':
+            errorMessage = 'Too many sign-in attempts';
+            errorDetails = 'You have exceeded the maximum number of sign-in attempts. Please wait a few minutes before trying again.';
+            errorCode = 'RATE_LIMITED';
+            break;
+          case 'User not found':
+            // Keep this vague to prevent user enumeration
+            errorMessage = 'Invalid credentials';
+            errorDetails = 'The email or password provided is incorrect. Please check your credentials and try again.';
+            errorCode = 'INVALID_CREDENTIALS';
+            break;
+          case 'User is disabled':
+            errorMessage = 'Account disabled';
+            errorDetails = 'Your account has been disabled. Please contact support for assistance.';
+            errorCode = 'ACCOUNT_DISABLED';
+            break;
+          default:
+            errorDetails = `Authentication error: ${error.message}`;
+        }
+
+        throw new UnauthorizedException({
+          message: errorMessage,
+          details: errorDetails,
+          code: errorCode,
+          status: HttpStatus.UNAUTHORIZED,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      // Check if authentication was successful but no session was created
+      if (!data?.session?.access_token) {
+        throw new UnauthorizedException({
+          message: 'Authentication incomplete',
+          details: 'Your credentials were accepted but no session was created. This may be due to account restrictions or system issues. Please try again or contact support.',
+          code: 'NO_SESSION',
+          status: HttpStatus.UNAUTHORIZED,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      // Verify user exists in our database
+      const user = await this.databaseService.db.query.users.findFirst({
+        where: eq(users.authId, data.user.id),
+      });
+      
+      if (!user) {
+        throw new UnauthorizedException({
+          message: 'Account not properly configured',
+          details: 'Your authentication was successful, but your account is not properly configured in our system. This may happen if your account was created but not fully set up. Please contact support for assistance.',
+          code: 'USER_NOT_CONFIGURED',
+          status: HttpStatus.UNAUTHORIZED,
+          timestamp: new Date().toISOString(),
+          authId: data.user.id, // Include auth ID for debugging
+        });
+      }
+
+      return {
+        success: true,
+        accessToken: data.session.access_token,
+        user: user,
+      };
+    } catch (error) {
+      // If it's already a BadRequestException or UnauthorizedException, re-throw it
+      if (error instanceof BadRequestException || error instanceof UnauthorizedException) {
+        throw error;
+      }
+
+      // Handle unexpected errors
+      console.error('Unexpected error during sign-in:', error);
+      
       throw new BadRequestException({
-        message: 'Failed to sign in',
-        details: 'Invalid credentials',
-        status: HttpStatus.UNAUTHORIZED,
+        message: 'Sign-in failed',
+        details: 'An unexpected error occurred during sign-in. Please try again later or contact support if the problem persists.',
+        code: 'INTERNAL_ERROR',
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        timestamp: new Date().toISOString(),
       });
     }
-
-    if (error) {
-      throw new BadRequestException({
-        message: 'Failed to sign in',
-        details: error.message,
-        status: error.status,
-      });
-    }
-
-    const user = await this.databaseService.db.query.users.findFirst({
-      where: eq(users.authId, data.user.id),
-    });
-    if (!user) {
-      throw new BadRequestException({
-        message: 'Failed to sign in',
-        details: 'User not found',
-        status: HttpStatus.UNAUTHORIZED,
-      });
-    }
-
-    return {
-      success: true,
-      accessToken: data.session.access_token,
-      user: user,
-    };
   }
 
   async signUp(signUpDto: SignUpDto): Promise<SignUpResponseDto> {
