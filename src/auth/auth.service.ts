@@ -140,77 +140,135 @@ export class AuthService {
   }
 
   async signUp(signUpDto: SignUpDto): Promise<SignUpResponseDto> {
-    //Check to see if the user email is already in the database and awaiting signup
-    const user = await this.databaseService.db.query.users.findFirst({
-      where: eq(users.email, signUpDto.email),
-    });
-
-    if (user && user.authId != null) {
-      throw new BadRequestException({
-        message: 'User already exists',
-        details: 'User already exists',
-        status: HttpStatus.BAD_REQUEST,
+    try {
+      // Check to see if the user email is already in the database and awaiting signup
+      const user = await this.databaseService.db.query.users.findFirst({
+        where: eq(users.email, signUpDto.email),
       });
-    }
 
-    const supabase = this.supabaseService.getServiceClient();
+      if (user && user.authId != null) {
+        throw new BadRequestException({
+          message: 'Account already exists',
+          details: 'An account with this email address already exists. Please try signing in instead, or use a different email address.',
+          code: 'USER_ALREADY_EXISTS',
+          status: HttpStatus.BAD_REQUEST,
+          timestamp: new Date().toISOString(),
+        });
+      }
 
-    const { data: authData, error: authError } =
-      await supabase.auth.admin.createUser({
-        email: signUpDto.email,
-        password: signUpDto.password,
-      });
-    if (authError) {
-      throw new BadRequestException({
-        message: 'Failed to sign up',
-        details: authError.message,
-        status: authError.status,
-      });
-    }
+      const supabase = this.supabaseService.getServiceClient();
 
-    //If the user is missing their authID, continue with sign up
-    if (user && !user.authId) {
-      await this.databaseService.db
-        .update(users)
-        .set({
-          authId: authData.user.id,
+      const { data: authData, error: authError } =
+        await supabase.auth.admin.createUser({
+          email: signUpDto.email,
+          password: signUpDto.password,
+        });
+
+      if (authError) {
+        let errorMessage = 'Sign-up failed';
+        let errorDetails = 'Unable to create your account. Please try again.';
+        let errorCode = 'SIGNUP_ERROR';
+
+        // Provide specific error messages for common sign-up issues
+        switch (authError.message) {
+          case 'User already registered':
+            errorMessage = 'Account already exists';
+            errorDetails = 'An account with this email address already exists. Please try signing in instead, or use a different email address.';
+            errorCode = 'USER_ALREADY_EXISTS';
+            break;
+          case 'Password should be at least 6 characters':
+            errorMessage = 'Password too short';
+            errorDetails = 'Your password must be at least 6 characters long. Please choose a stronger password.';
+            errorCode = 'WEAK_PASSWORD';
+            break;
+          case 'Invalid email':
+            errorMessage = 'Invalid email address';
+            errorDetails = 'Please provide a valid email address.';
+            errorCode = 'INVALID_EMAIL';
+            break;
+          case 'Signup disabled':
+            errorMessage = 'Sign-up disabled';
+            errorDetails = 'New account creation is currently disabled. Please contact support for assistance.';
+            errorCode = 'SIGNUP_DISABLED';
+            break;
+          case 'Too many requests':
+            errorMessage = 'Too many sign-up attempts';
+            errorDetails = 'You have exceeded the maximum number of sign-up attempts. Please wait a few minutes before trying again.';
+            errorCode = 'RATE_LIMITED';
+            break;
+          default:
+            errorDetails = `Sign-up error: ${authError.message}`;
+        }
+
+        throw new BadRequestException({
+          message: errorMessage,
+          details: errorDetails,
+          code: errorCode,
+          status: authError.status || HttpStatus.BAD_REQUEST,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      // If the user is missing their authID, continue with sign up
+      if (user && !user.authId) {
+        await this.databaseService.db
+          .update(users)
+          .set({
+            authId: authData.user.id,
+            displayName: signUpDto.displayName,
+            ...(signUpDto.fullName && { fullName: signUpDto.fullName }),
+            ...(signUpDto.phone && { phone: signUpDto.phone }),
+            ...(signUpDto.country && { country: signUpDto.country }),
+          })
+          .where(eq(users.email, signUpDto.email));
+      } else {
+        await this.databaseService.db.insert(users).values({
+          email: signUpDto.email,
           displayName: signUpDto.displayName,
+          
           ...(signUpDto.fullName && { fullName: signUpDto.fullName }),
           ...(signUpDto.phone && { phone: signUpDto.phone }),
           ...(signUpDto.country && { country: signUpDto.country }),
-        })
-        .where(eq(users.email, signUpDto.email));
-    } else {
-      await this.databaseService.db.insert(users).values({
-        email: signUpDto.email,
-        displayName: signUpDto.displayName,
-        
-        ...(signUpDto.fullName && { fullName: signUpDto.fullName }),
-        ...(signUpDto.phone && { phone: signUpDto.phone }),
-        ...(signUpDto.country && { country: signUpDto.country }),
 
-        authId: authData.user.id,
-      });
-    }
-
-    try {
-      const { rejected, rejectedErrors } = await this.emailSignUpConfirmation(
-        signUpDto.email,
-        signUpDto.displayName,
-      );
-
-      if (rejected.length > 0) {
-        throw new Error(`Email "${rejected[0]}" was rejected`, {
-          cause: rejectedErrors,
+          authId: authData.user.id,
         });
       }
-    } catch (error) {
-      console.error('email error', error);
-    }
 
-    return {
-      success: true,
-    };
+      try {
+        const { rejected, rejectedErrors } = await this.emailSignUpConfirmation(
+          signUpDto.email,
+          signUpDto.displayName,
+        );
+
+        if (rejected.length > 0) {
+          console.error('Email confirmation failed:', rejected, rejectedErrors);
+          // Don't fail the sign-up if email fails, just log it
+        }
+      } catch (error) {
+        console.error('Email confirmation error:', error);
+        // Don't fail the sign-up if email fails, just log it
+      }
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      // If it's already a BadRequestException, re-throw it
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      // Handle unexpected errors
+      console.error('Unexpected error during sign-up:', error);
+      
+      throw new BadRequestException({
+        message: 'Sign-up failed',
+        details: 'An unexpected error occurred during sign-up. Please try again later or contact support if the problem persists.',
+        code: 'INTERNAL_ERROR',
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        timestamp: new Date().toISOString(),
+      });
+    }
   }
 
   async confirmSignUp(token_hash: string) {
