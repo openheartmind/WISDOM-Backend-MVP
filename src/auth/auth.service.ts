@@ -202,6 +202,20 @@ export class AuthService {
     return msgInfo;
   }
 
+  async updateUserProfile(userId: string, payload: ProfileUpdateDto) {
+    try {
+      const result = await this.databaseService.db
+        .update(users)
+        .set(payload)
+        .where(eq(users.id, userId))
+        .returning();
+      return result[0]
+    } catch (error) {
+      console.error(error);
+      throw new UnprocessableEntityException('Unable to update user profile')
+    }
+  }
+
   async updatePassword(authId: string, password: string) {
     const supabase = this.supabaseService.getServiceClient();
     const { error } = await supabase.auth.admin.updateUserById(authId, { password });
