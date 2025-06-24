@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   HttpStatus,
   Injectable,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { DatabaseService } from 'src/database/database.service';
@@ -21,6 +22,7 @@ import {
   animals,
 } from 'unique-names-generator';
 import jwt from 'jsonwebtoken';
+import { ProfileUpdateDto } from './dto/profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +31,7 @@ export class AuthService {
     private databaseService: DatabaseService,
     private mailerService: MailerService,
     private config: ConfigService<EnvironmentVariables>,
-  ) {}
+  ) { }
 
   async signIn(signInDto: SignInDto): Promise<SignInResponseDto> {
     const supabase = this.supabaseService.getClient();
@@ -117,7 +119,7 @@ export class AuthService {
       await this.databaseService.db.insert(users).values({
         email: signUpDto.email,
         displayName: signUpDto.displayName,
-        
+
         ...(signUpDto.fullName && { fullName: signUpDto.fullName }),
         ...(signUpDto.phone && { phone: signUpDto.phone }),
         ...(signUpDto.country && { country: signUpDto.country }),
@@ -200,6 +202,20 @@ export class AuthService {
     });
 
     return msgInfo;
+  }
+
+  async updateUserProfile(userId: string, payload: ProfileUpdateDto) {
+    try {
+      const result = await this.databaseService.db
+        .update(users)
+        .set(payload)
+        .where(eq(users.id, userId))
+        .returning();
+      return result[0]
+    } catch (error) {
+      console.error(error);
+      throw new UnprocessableEntityException('Unable to update user profile')
+    }
   }
 
   /**

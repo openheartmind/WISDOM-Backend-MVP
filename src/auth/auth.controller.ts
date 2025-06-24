@@ -23,6 +23,7 @@ import { GetUser } from './decorator/get-user.decorator';
 import { User } from 'src/database/schema';
 import { AuthGuard } from './auth.guard';
 import { DecodeInviteResponseDto } from './dto/decode-invite.dto';
+import { ProfileUpdateDto } from './dto/profile.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -68,6 +69,14 @@ export class AuthController {
     return user;
   }
 
+  @Post('/profile')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update current user\'s profile data' })
+  async updateProfile(@Body() payload: ProfileUpdateDto, @GetUser() { id }: User) {
+    return await this.authService.updateUserProfile(id, payload)
+  }
+
   @Get('/invite/decode')
   @ApiOperation({ summary: 'Decode and verify an invite token' })
   @ApiQuery({
@@ -75,14 +84,14 @@ export class AuthController {
     description: 'JWT invite token containing the invited user\'s email',
     required: true,
   })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Token successfully decoded',
-    type: DecodeInviteResponseDto 
+    type: DecodeInviteResponseDto
   })
-  @ApiResponse({ 
-    status: HttpStatus.BAD_REQUEST, 
-    description: 'Invalid or expired token' 
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid or expired token'
   })
   async decodeInviteToken(@Query('token') token: string): Promise<DecodeInviteResponseDto> {
     return await this.authService.verifyInviteToken(token);
