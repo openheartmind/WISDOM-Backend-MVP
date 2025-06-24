@@ -58,6 +58,13 @@ Once Supabase was successfully initialized and running, we run the Drizzle migra
 npx drizzle-kit migrate
 ```
 
+To seed the database with the initial data, run:
+
+```
+npm run db:seed
+```
+
+
 If any changes are made to the local schema files, the following command needs to be executed to re-create the SQL files with these changes, followed by the command to apply it on the database.
 ```
 npx drizzle-kit generate
@@ -164,4 +171,5 @@ After resetting the database, all data will be removed and you will need to recr
 ```
 npx drizzle-kit generate
 npx drizzle-kit migrate
+npm run db:seed
 ```
