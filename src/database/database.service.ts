@@ -4,7 +4,7 @@ import { Database } from './database.types';
 import { drizzle as drizzlePg } from 'drizzle-orm/node-postgres';
 import { drizzle as drizzlePglite } from 'drizzle-orm/pglite';
 import { Pool } from 'pg';
-import { PGlite } from '@electric-sql/pglite';
+const { PGlite } = require('@electric-sql/pglite') as { PGlite: any };
 import * as schema from './schema';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from 'src/config/app-config';
