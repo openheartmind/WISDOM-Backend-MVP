@@ -22,6 +22,8 @@ import {
   animals,
 } from 'unique-names-generator';
 import jwt from 'jsonwebtoken';
+import { AuthErrorCode } from './auth.error-codes';
+import { AuthError, AuthApiError } from '@supabase/supabase-js';
 
 @Injectable()
 export class AuthService {
@@ -42,45 +44,36 @@ export class AuthService {
 
       // Check for Supabase authentication errors first
       if (error) {
-        let errorMessage = 'Authentication failed';
-        let errorDetails = 'Unable to authenticate with the provided credentials';
-        let errorCode = 'AUTH_ERROR';
+        let errorCode = AuthErrorCode.AUTH_ERROR;
+        let errorDetails = 'An authentication error occurred. Please try again.';
 
-        // Provide more specific error messages based on Supabase error types
-        switch (error.message) {
-          case 'Invalid login credentials':
-            // Keep this vague to prevent DoS attacks
-            errorMessage = 'Invalid credentials';
-            errorDetails = 'The email or password provided is incorrect. Please check your credentials and try again.';
-            errorCode = 'INVALID_CREDENTIALS';
-            break;
-          case 'Email not confirmed':
-            errorMessage = 'Email verification required';
-            errorDetails = 'Please check your email and click the verification link before signing in. If you haven\'t received the email, please check your spam folder or request a new verification email.';
-            errorCode = 'EMAIL_NOT_VERIFIED';
-            break;
-          case 'Too many requests':
-            errorMessage = 'Too many sign-in attempts';
-            errorDetails = 'You have exceeded the maximum number of sign-in attempts. Please wait a few minutes before trying again.';
-            errorCode = 'RATE_LIMITED';
-            break;
-          case 'User not found':
-            // Keep this vague to prevent user enumeration
-            errorMessage = 'Invalid credentials';
-            errorDetails = 'The email or password provided is incorrect. Please check your credentials and try again.';
-            errorCode = 'INVALID_CREDENTIALS';
-            break;
-          case 'User is disabled':
-            errorMessage = 'Account disabled';
-            errorDetails = 'Your account has been disabled. Please contact support for assistance.';
-            errorCode = 'ACCOUNT_DISABLED';
-            break;
-          default:
-            errorDetails = `Authentication error: ${error.message}`;
+        // Map Supabase error codes to our stable error codes
+        if (error.code) {
+          switch (error.code) {
+            case 'invalid_credentials':
+              errorCode = AuthErrorCode.INVALID_CREDENTIALS;
+              errorDetails = 'The email or password provided is incorrect. Please check your credentials and try again.';
+              break;
+            case 'email_not_confirmed':
+              errorCode = AuthErrorCode.EMAIL_NOT_VERIFIED;
+              errorDetails = 'Please check your email and click the verification link before signing in. If you haven\'t received the email, please check your spam folder or request a new verification email.';
+              break;
+            case 'over_request_rate_limit':
+              errorCode = AuthErrorCode.RATE_LIMITED;
+              errorDetails = 'You have exceeded the maximum number of sign-in attempts. Please wait a few minutes before trying again.';
+              break;
+            default:
+              errorCode = AuthErrorCode.AUTH_ERROR;
+              errorDetails = 'An authentication error occurred. Please try again or contact support if the problem persists.';
+          }
+        } else if (error instanceof AuthApiError || error instanceof AuthError) {
+          // Use built-in Supabase error type checking
+          errorCode = AuthErrorCode.AUTH_ERROR;
+          errorDetails = 'An authentication error occurred. Please try again or contact support if the problem persists.';
         }
 
         throw new UnauthorizedException({
-          message: errorMessage,
+          message: 'Authentication failed',
           details: errorDetails,
           code: errorCode,
           status: HttpStatus.UNAUTHORIZED,
@@ -91,9 +84,9 @@ export class AuthService {
       // Check if authentication was successful but no session was created
       if (!data?.session?.access_token) {
         throw new UnauthorizedException({
-          message: 'Authentication incomplete',
+          message: 'Authentication failed',
           details: 'Your credentials were accepted but no session was created. This may be due to account restrictions or system issues. Please try again or contact support.',
-          code: 'NO_SESSION',
+          code: AuthErrorCode.AUTH_ERROR,
           status: HttpStatus.UNAUTHORIZED,
           timestamp: new Date().toISOString(),
         });
@@ -106,12 +99,11 @@ export class AuthService {
       
       if (!user) {
         throw new UnauthorizedException({
-          message: 'Account not properly configured',
+          message: 'Authentication failed',
           details: 'Your authentication was successful, but your account is not properly configured in our system. This may happen if your account was created but not fully set up. Please contact support for assistance.',
-          code: 'USER_NOT_CONFIGURED',
+          code: AuthErrorCode.AUTH_ERROR,
           status: HttpStatus.UNAUTHORIZED,
           timestamp: new Date().toISOString(),
-          authId: data.user.id, // Include auth ID for debugging
         });
       }
 
@@ -125,12 +117,9 @@ export class AuthService {
       if (error instanceof BadRequestException || error instanceof UnauthorizedException) {
         throw error;
       }
-
-      // Handle unexpected errors
-      console.error('Unexpected error during sign-in:', error);
       
       throw new BadRequestException({
-        message: 'Sign-in failed',
+        message: 'Authentication failed',
         details: 'An unexpected error occurred during sign-in. Please try again later or contact support if the problem persists.',
         code: 'INTERNAL_ERROR',
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -148,9 +137,9 @@ export class AuthService {
 
       if (user && user.authId != null) {
         throw new BadRequestException({
-          message: 'Account already exists',
+          message: 'Sign-up failed',
           details: 'An account with this email address already exists. Please try signing in instead, or use a different email address.',
-          code: 'USER_ALREADY_EXISTS',
+          code: AuthErrorCode.AUTH_ERROR,
           status: HttpStatus.BAD_REQUEST,
           timestamp: new Date().toISOString(),
         });
@@ -165,43 +154,44 @@ export class AuthService {
         });
 
       if (authError) {
-        let errorMessage = 'Sign-up failed';
-        let errorDetails = 'Unable to create your account. Please try again.';
-        let errorCode = 'SIGNUP_ERROR';
+        let errorCode = AuthErrorCode.AUTH_ERROR;
+        let errorDetails = 'A sign-up error occurred. Please try again.';
 
-        // Provide specific error messages for common sign-up issues
-        switch (authError.message) {
-          case 'User already registered':
-            errorMessage = 'Account already exists';
-            errorDetails = 'An account with this email address already exists. Please try signing in instead, or use a different email address.';
-            errorCode = 'USER_ALREADY_EXISTS';
-            break;
-          case 'Password should be at least 6 characters':
-            errorMessage = 'Password too short';
-            errorDetails = 'Your password must be at least 6 characters long. Please choose a stronger password.';
-            errorCode = 'WEAK_PASSWORD';
-            break;
-          case 'Invalid email':
-            errorMessage = 'Invalid email address';
-            errorDetails = 'Please provide a valid email address.';
-            errorCode = 'INVALID_EMAIL';
-            break;
-          case 'Signup disabled':
-            errorMessage = 'Sign-up disabled';
-            errorDetails = 'New account creation is currently disabled. Please contact support for assistance.';
-            errorCode = 'SIGNUP_DISABLED';
-            break;
-          case 'Too many requests':
-            errorMessage = 'Too many sign-up attempts';
-            errorDetails = 'You have exceeded the maximum number of sign-up attempts. Please wait a few minutes before trying again.';
-            errorCode = 'RATE_LIMITED';
-            break;
-          default:
-            errorDetails = `Sign-up error: ${authError.message}`;
+        // Map Supabase error codes to our stable error codes
+        if (authError.code) {
+          switch (authError.code) {
+            case 'user_already_exists':
+              errorCode = AuthErrorCode.AUTH_ERROR;
+              errorDetails = 'An account with this email address already exists. Please try signing in instead, or use a different email address.';
+              break;
+            case 'weak_password':
+              errorCode = AuthErrorCode.AUTH_ERROR;
+              errorDetails = 'The password provided is too weak. Please use a stronger password.';
+              break;
+            case 'email_address_invalid':
+              errorCode = AuthErrorCode.AUTH_ERROR;
+              errorDetails = 'The email address provided is invalid. Please use a valid email address.';
+              break;
+            case 'signup_disabled':
+              errorCode = AuthErrorCode.AUTH_ERROR;
+              errorDetails = 'Sign-up is currently disabled. Please try again later or contact support if the problem persists.';
+              break;
+            case 'too_many_requests':
+            case 'rate_limit_exceeded':
+              errorCode = AuthErrorCode.RATE_LIMITED;
+              errorDetails = 'You have exceeded the maximum number of sign-up attempts. Please wait a few minutes before trying again.';
+              break;
+            default:
+              errorCode = AuthErrorCode.AUTH_ERROR;
+          }
+        } else if (authError instanceof AuthApiError || authError instanceof AuthError) {
+          // Use built-in Supabase error type checking
+          errorCode = AuthErrorCode.AUTH_ERROR;
+          errorDetails = 'An authentication error occurred. Please try again or contact support if the problem persists.';
         }
 
         throw new BadRequestException({
-          message: errorMessage,
+          message: 'Sign-up failed',
           details: errorDetails,
           code: errorCode,
           status: authError.status || HttpStatus.BAD_REQUEST,
