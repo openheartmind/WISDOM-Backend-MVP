@@ -13,7 +13,6 @@
     "db:generate": "npx drizzle-kit generate",
     "db:generate:test": "npx drizzle-kit generate --config=drizzle-test.config.ts",
     "db:seed": "tsx src/database/seed/run-seed.ts",
-    "db:verify": "tsx src/database/seed/verify-seed.ts",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
