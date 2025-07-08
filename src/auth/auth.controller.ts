@@ -6,11 +6,8 @@ import {
   Get,
   UseGuards,
   Query,
-<<<<<<< HEAD
-=======
   UnprocessableEntityException,
   HttpCode,
->>>>>>> dev
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -88,18 +85,6 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Token successfully decoded',
-<<<<<<< HEAD
-    type: DecodeInviteResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid or expired token',
-  })
-  async decodeInviteToken(
-    @Query('token') token: string,
-  ): Promise<DecodeInviteResponseDto> {
-    return await this.authService.verifyInviteToken(token);
-=======
     type: DecodeInviteResponseDto
   })
   @ApiResponse({
@@ -142,6 +127,5 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.OK, type: AuthenticateResponseDto })
   async recoverAccount(@Body() { email, token }: RecoveryTokenAuthDto) {
     return await this.authService.recoverAccount(email, token)
->>>>>>> dev
   }
 }
