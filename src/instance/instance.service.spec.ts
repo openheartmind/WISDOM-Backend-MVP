@@ -14,8 +14,9 @@ const mockAuthService = {
 
 describe('InstanceService', () => {
   let service: InstanceService;
-
+  let database: DatabaseService;
   beforeEach(async () => {
+    
     const module: TestingModule = await Test.createTestingModule({
       imports: [DatabaseModule],
       providers: [
@@ -28,11 +29,23 @@ describe('InstanceService', () => {
         },
       ],
     }).compile();
+    
 
     service = module.get<InstanceService>(InstanceService);
+    database = module.get<DatabaseService>(DatabaseService);
+    await database.onModuleInit()
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+  it('should be able to create an instance', async () => {
+    const instance = await service.create({
+      description: 'test',
+      title: 'test',
+      createdBy: 'test',
+    });
+    expect(instance).toBeDefined();
+  });
+
 });
