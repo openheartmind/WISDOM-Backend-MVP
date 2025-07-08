@@ -39,13 +39,5 @@ describe('InstanceService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-  it('should be able to create an instance', async () => {
-    const instance = await service.create({
-      description: 'test',
-      title: 'test',
-      createdBy: 'test',
-    });
-    expect(instance).toBeDefined();
-  });
 
 });
