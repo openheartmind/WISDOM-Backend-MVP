@@ -5,6 +5,7 @@ import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { InstanceModule } from './instance/instance.module';
 import { ContributionsModule } from './contributions/contributions.module';
+import { DimensionsModule } from './dimensions/dimensions.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { ContributionsModule } from './contributions/contributions.module';
     DatabaseModule,
     AuthModule,
     InstanceModule,
-    ContributionsModule
+    ContributionsModule,
+    DimensionsModule
   ],
   controllers: [],
 })
