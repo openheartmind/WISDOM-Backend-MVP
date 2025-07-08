@@ -57,3 +57,5 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Package lock file - removed to prevent cross-platform issues
 package-lock.json
+
+test_db
