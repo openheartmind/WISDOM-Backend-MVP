@@ -27,7 +27,6 @@ import { AuthGuard } from './auth.guard';
 import { DecodeInviteResponseDto } from './dto/decode-invite.dto';
 import { ProfileUpdateDto } from './dto/profile.dto';
 import { InitRecoverPasswordDto, PasswordDto, RecoveryTokenAuthDto } from './dto/password.dto';
-import { ProfileUpdateDto } from './dto/profile.dto';
 
 @Controller('auth')
 export class AuthController {

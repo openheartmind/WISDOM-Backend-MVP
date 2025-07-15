@@ -283,20 +283,6 @@ export class AuthService {
     return { user, accessToken: session.access_token, success: true };
   }
 
-  async updateUserProfile(userId: string, payload: ProfileUpdateDto) {
-    try {
-      const result = await this.databaseService.db
-        .update(users)
-        .set(payload)
-        .where(eq(users.id, userId))
-        .returning();
-      return result[0]
-    } catch (error) {
-      console.error(error);
-      throw new UnprocessableEntityException('Unable to update user profile')
-    }
-  }
-
   /**
    * Invite a user to join an instance
    * @param email The email of the user to invite
