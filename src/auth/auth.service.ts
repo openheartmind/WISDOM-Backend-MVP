@@ -283,6 +283,7 @@ export class AuthService {
     return { user, accessToken: session.access_token, success: true };
   }
 
+<<<<<<< HEAD
   async updateUserProfile(userId: string, payload: ProfileUpdateDto) {
     try {
       const result = await this.databaseService.db
@@ -364,6 +365,8 @@ export class AuthService {
     return { user, accessToken: session.access_token, success: true };
   }
 
+=======
+>>>>>>> 3c6de4c (remove duplicate code)
   /**
    * Invite a user to join an instance
    * @param email The email of the user to invite
