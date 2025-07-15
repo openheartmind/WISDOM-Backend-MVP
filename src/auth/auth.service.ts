@@ -284,6 +284,7 @@ export class AuthService {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   async updateUserProfile(userId: string, payload: ProfileUpdateDto) {
     try {
       const result = await this.databaseService.db
@@ -367,6 +368,8 @@ export class AuthService {
 
 =======
 >>>>>>> 3c6de4c (remove duplicate code)
+=======
+>>>>>>> refs/remotes/origin/feat/92-user-profile-update
   /**
    * Invite a user to join an instance
    * @param email The email of the user to invite
