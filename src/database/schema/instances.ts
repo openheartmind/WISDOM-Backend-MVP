@@ -7,6 +7,7 @@ export const pgInstances = pgTable('instances', {
   title: text('title').notNull(),
   description: text('description').notNull(),
   createdBy: uuid('created_by').references(() => users.id),
+  status: text('status'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
