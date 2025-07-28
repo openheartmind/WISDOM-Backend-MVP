@@ -25,7 +25,16 @@ import { GetUser } from './decorator/get-user.decorator';
 import { User } from 'src/database/schema';
 import { AuthGuard } from './auth.guard';
 import { DecodeInviteResponseDto } from './dto/decode-invite.dto';
+import { ProfileUpdateDto } from './dto/profile.dto';
 import { InitRecoverPasswordDto, PasswordDto, RecoveryTokenAuthDto } from './dto/password.dto';
+<<<<<<< HEAD
+<<<<<<< HEAD
+import { ProfileUpdateDto } from './dto/profile.dto';
+import { InitRecoverPasswordDto, PasswordDto, RecoveryTokenAuthDto } from './dto/password.dto';
+=======
+>>>>>>> 3c6de4c (remove duplicate code)
+=======
+>>>>>>> refs/remotes/origin/feat/92-user-profile-update
 
 @Controller('auth')
 export class AuthController {
@@ -69,6 +78,14 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async me(@GetUser() user: User) {
     return user;
+  }
+
+  @Post('/profile')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update current user\'s profile data' })
+  async updateProfile(@Body() payload: ProfileUpdateDto, @GetUser() { id }: User) {
+    return await this.authService.updateUserProfile(id, payload)
   }
 
   @Get('/invite/decode')

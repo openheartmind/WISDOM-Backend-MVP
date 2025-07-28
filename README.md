@@ -29,7 +29,7 @@ npx supabase init
 npx supabase db reset
 ```
 
-After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again. Best to run the generate command as well to make sure all the latest schema changes are present -
+After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again -
 
 ```
 npx drizzle-kit migrate
@@ -159,9 +159,18 @@ It's most likely that you have conflicts. The following command should resolve i
 npx supabase db reset
 ```
 
-After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again. Best to run the generate command as well to make sure all the latest schema changes are present -
+After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again -
 
 ```
-npx drizzle-kit generate
 npx drizzle-kit migrate
+```
+
+### Docker Error - failed to start docker container: Error response from daemon: ports are not available: exposing port TCP 0.0.0.0:54322 -> 127.0.0.1:0: listen tcp 0.0.0.0:54322: bind: An attempt was made to access a socket in a way forbidden by its access permissions
+Make sure Docker runs properly on your machine. It might require some updates.
+If it is running but failing to start the instance, the ports are blocked on your machine.
+On a windows machine, use the following commands to solve this -
+```
+net stop winnat
+netsh int ipv4 add excludedportrange protocol=tcp startport=54322 numberofports=1
+net start winnat
 ```
