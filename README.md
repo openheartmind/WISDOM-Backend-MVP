@@ -58,6 +58,13 @@ Once Supabase was successfully initialized and running, we run the Drizzle migra
 npx drizzle-kit migrate
 ```
 
+To seed the database with the initial data, run:
+
+```
+npm run db:seed
+```
+
+
 If any changes are made to the local schema files, the following command needs to be executed to re-create the SQL files with these changes, followed by the command to apply it on the database.
 ```
 npx drizzle-kit generate
@@ -163,6 +170,7 @@ After resetting the database, all data will be removed and you will need to recr
 
 ```
 npx drizzle-kit migrate
+npm run db:seed
 ```
 
 ### Docker Error - failed to start docker container: Error response from daemon: ports are not available: exposing port TCP 0.0.0.0:54322 -> 127.0.0.1:0: listen tcp 0.0.0.0:54322: bind: An attempt was made to access a socket in a way forbidden by its access permissions
