@@ -16,7 +16,7 @@ git clone https://github.com/openheartmind/WISDOM-Backend-MVP
 
 Next, open the cloned repository with your IDE and in the terminal window, execute the installation command:
 ```
-npm i
+pnpm install
 ```
 
 Next, we install Supabase as a local copy. Run the following command to initialize it on your machine:
@@ -66,14 +66,14 @@ npx drizzle-kit migrate
 
 Finally, we are ready to run the development environment by running the following command:
 ```
-npm run start:dev
+pnpm run start:dev
 ```
 
 At this point, your backend should be running.
 
 To complie the project for production, run the following:
 ```
-npm run start:prod
+pnpm run start:prod
 ```
 
 ## Run tests
@@ -81,13 +81,13 @@ npm run start:prod
 ### Automated Tests
 ```bash
 # unit tests
-$ npm run test
+$ pnpm run test
 
 # e2e tests
-$ npm run test:e2e
+$ pnpm run test:e2e
 
 # test coverage
-$ npm run test:cov
+$ pnpm run test:cov
 ```
 
 ### Manual Workflows - User Creation

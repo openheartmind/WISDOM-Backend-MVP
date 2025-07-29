@@ -1,14 +1,29 @@
 import { execSync } from 'child_process';
-import { beforeAll } from 'vitest';
+import { beforeAll, beforeEach } from 'vitest';
+const { PGlite } = require('@electric-sql/pglite') as { PGlite: any };
+import { drizzle } from 'drizzle-orm/pglite';
+import { migrate } from 'drizzle-orm/pglite/migrator';
+
+let testDb: typeof PGlite;
+let isDbInitialized = false;
 
 beforeAll(async () => {
-  // Run migrations before all tests
-  console.log('Running Drizzle migrations...');
+
+  if(isDbInitialized) return;
+  console.log('Initializing test database...');
+  
   try {
-    execSync('npm run db:migrate:test', { stdio: 'inherit' });
-    console.log('Drizzle migrations completed successfully');
+    // Create fresh in-memory database for each test run
+    testDb = new PGlite('./test_db');
+    
+    // Run migrations directly instead of via npm script
+    const db = drizzle(testDb);
+    await migrate(db, { migrationsFolder: './drizzle' });
+    
+    console.log('Test database initialized successfully');
+    isDbInitialized = true;
   } catch (error) {
-    console.error('Error running Drizzle migrations:', error);
+    console.error('Error initializing test database:', error);
     throw error;
   }
 });

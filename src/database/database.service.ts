@@ -4,7 +4,7 @@ import { Database } from './database.types';
 import { drizzle as drizzlePg } from 'drizzle-orm/node-postgres';
 import { drizzle as drizzlePglite } from 'drizzle-orm/pglite';
 import { Pool } from 'pg';
-import { PGlite } from '@electric-sql/pglite';
+const { PGlite } = require('@electric-sql/pglite') as { PGlite: any };
 import * as schema from './schema';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from 'src/config/app-config';
@@ -21,9 +21,8 @@ export class DatabaseService implements OnModuleInit {
 
   private async initializeDatabase() {
     const env = this.configService.getOrThrow('NODE_ENV');
-
     if (env === 'test') {
-      const pgliteDB = new PGlite();
+      const pgliteDB = new PGlite('./test_db');
 
       this.db = drizzlePglite(pgliteDB, { schema: schema });
     } else {
