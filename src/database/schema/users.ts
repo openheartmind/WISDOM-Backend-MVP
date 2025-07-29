@@ -10,7 +10,7 @@ export const users = pgTable('users', {
   phone: text('phone').default(''),
   country: text('country').default(''),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
 });
 
 export type User = typeof users.$inferSelect;

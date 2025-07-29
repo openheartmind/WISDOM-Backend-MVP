@@ -22,6 +22,7 @@ import {
   animals,
 } from 'unique-names-generator';
 import jwt from 'jsonwebtoken';
+import { ProfileUpdateDto } from './dto/profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -201,6 +202,20 @@ export class AuthService {
     return msgInfo;
   }
 
+  async updateUserProfile(userId: string, payload: ProfileUpdateDto) {
+    try {
+      const result = await this.databaseService.db
+        .update(users)
+        .set(payload)
+        .where(eq(users.id, userId))
+        .returning();
+      return result[0]
+    } catch (error) {
+      console.error(error);
+      throw new UnprocessableEntityException('Unable to update user profile')
+    }
+  }
+
   async updatePassword(authId: string, password: string) {
     const supabase = this.supabaseService.getServiceClient();
     const { error } = await supabase.auth.admin.updateUserById(authId, { password });
@@ -268,6 +283,93 @@ export class AuthService {
     return { user, accessToken: session.access_token, success: true };
   }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+  async updateUserProfile(userId: string, payload: ProfileUpdateDto) {
+    try {
+      const result = await this.databaseService.db
+        .update(users)
+        .set(payload)
+        .where(eq(users.id, userId))
+        .returning();
+      return result[0]
+    } catch (error) {
+      console.error(error);
+      throw new UnprocessableEntityException('Unable to update user profile')
+    }
+  }
+
+  async updatePassword(authId: string, password: string) {
+    const supabase = this.supabaseService.getServiceClient();
+    const { error } = await supabase.auth.admin.updateUserById(authId, { password });
+    if (error) {
+      console.error(error);
+      throw new BadRequestException(error);
+    }
+    return {
+      success: true
+    }
+  }
+
+  async sendPasswordRecoveryToken(email: string) {
+    const supabase = this.supabaseService.getServiceClient();
+    const { data, error } = await supabase.auth.admin.generateLink({
+      email,
+      type: 'recovery',
+    });
+    if (error) {
+      throw new BadRequestException({
+        message: 'Failed to initiate password recovery',
+        details: error.message,
+        status: error.status,
+      });
+    }
+
+    const { email_otp } = data.properties
+    const msgInfo = await this.mailerService.send({
+      template: join(__dirname, 'email', 'recovery'),
+      message: {
+        to: email,
+      },
+      locals: {
+        token: email_otp,
+      },
+    });
+
+    const { rejected, rejectedErrors } = msgInfo;
+
+    if (rejected.length > 0) {
+      console.error(rejectedErrors?.at(0))
+      throw new UnprocessableEntityException(
+        'Email sending failed',
+        rejectedErrors?.at(0)?.message
+      )
+    }
+  }
+
+  async recoverAccount(email: string, token: string) {
+    const supabase = this.supabaseService.getClient();
+    const {
+      data: { user, session },
+      error,
+    } = await supabase.auth.verifyOtp({ email, token, type: 'recovery' });
+
+    if (error) {
+      throw new ForbiddenException(error);
+    }
+    if (!user || !session) {
+      // this should not occur if no error above
+      throw new ForbiddenException('Failed to obtain an auth session')
+    }
+
+    // same response as successful signIn
+    return { user, accessToken: session.access_token, success: true };
+  }
+
+=======
+>>>>>>> 3c6de4c (remove duplicate code)
+=======
+>>>>>>> refs/remotes/origin/feat/92-user-profile-update
   /**
    * Invite a user to join an instance
    * @param email The email of the user to invite
