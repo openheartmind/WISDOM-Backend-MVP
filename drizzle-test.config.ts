@@ -6,6 +6,6 @@ export default {
   dialect: 'postgresql',
   driver: 'pglite',
   dbCredentials: {
-    url: 'memory://',
+    url: './test_db',
   }
 } satisfies Config;

@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Injectable,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { DatabaseService } from 'src/database/database.service';
@@ -24,6 +25,7 @@ import {
 import jwt from 'jsonwebtoken';
 import { AuthErrorCode } from './auth.error-codes';
 import { AuthError, AuthApiError } from '@supabase/supabase-js';
+import { ProfileUpdateDto } from './dto/profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +34,7 @@ export class AuthService {
     private databaseService: DatabaseService,
     private mailerService: MailerService,
     private config: ConfigService<EnvironmentVariables>,
-  ) {}
+  ) { }
 
   async signIn(signInDto: SignInDto): Promise<SignInResponseDto> {
     try {
@@ -215,10 +217,21 @@ export class AuthService {
         await this.databaseService.db.insert(users).values({
           email: signUpDto.email,
           displayName: signUpDto.displayName,
-          
-          ...(signUpDto.fullName && { fullName: signUpDto.fullName }),
-          ...(signUpDto.phone && { phone: signUpDto.phone }),
-          ...(signUpDto.country && { country: signUpDto.country }),
+          fullName: signUpDto.fullName,
+          phone: signUpDto.phone,
+          country: signUpDto.country,
+        })
+        .where(eq(users.email, signUpDto.email));
+    } else {
+      await this.databaseService.db.insert(users).values({
+        email: signUpDto.email,
+        displayName: signUpDto.displayName,
+        fullName: signUpDto.fullName,
+        phone: signUpDto.phone,
+        country: signUpDto.country,
+        authId: authData.user.id,
+      });
+    }
 
           authId: authData.user.id,
         });
@@ -301,7 +314,7 @@ export class AuthService {
 
     const { hashed_token } = data.properties;
     const confirmURL = new URL(confirmBaseURL);
-    confirmURL.search = `hashed_token=${hashed_token}`;
+    confirmURL.search = `token=${hashed_token}`;
 
     const msgInfo = await this.mailerService.send({
       template: join(__dirname, 'email', 'confirm'),
@@ -315,6 +328,168 @@ export class AuthService {
     });
 
     return msgInfo;
+  }
+
+  async updateUserProfile(userId: string, payload: ProfileUpdateDto) {
+    try {
+      const result = await this.databaseService.db
+        .update(users)
+        .set(payload)
+        .where(eq(users.id, userId))
+        .returning();
+      return result[0]
+    } catch (error) {
+      console.error(error);
+      throw new UnprocessableEntityException('Unable to update user profile')
+    }
+  }
+
+  async updatePassword(authId: string, password: string) {
+    const supabase = this.supabaseService.getServiceClient();
+    const { error } = await supabase.auth.admin.updateUserById(authId, { password });
+    if (error) {
+      console.error(error);
+      throw new BadRequestException(error);
+    }
+    return {
+      success: true
+    }
+  }
+
+  async sendPasswordRecoveryToken(email: string) {
+    const supabase = this.supabaseService.getServiceClient();
+    const { data, error } = await supabase.auth.admin.generateLink({
+      email,
+      type: 'recovery',
+    });
+    if (error) {
+      throw new BadRequestException({
+        message: 'Failed to initiate password recovery',
+        details: error.message,
+        status: error.status,
+      });
+    }
+
+    const { email_otp } = data.properties
+    const msgInfo = await this.mailerService.send({
+      template: join(__dirname, 'email', 'recovery'),
+      message: {
+        to: email,
+      },
+      locals: {
+        token: email_otp,
+      },
+    });
+
+    const { rejected, rejectedErrors } = msgInfo;
+
+    if (rejected.length > 0) {
+      console.error(rejectedErrors?.at(0))
+      throw new UnprocessableEntityException(
+        'Email sending failed',
+        rejectedErrors?.at(0)?.message
+      )
+    }
+  }
+
+  async recoverAccount(email: string, token: string) {
+    const supabase = this.supabaseService.getClient();
+    const {
+      data: { user, session },
+      error,
+    } = await supabase.auth.verifyOtp({ email, token, type: 'recovery' });
+
+    if (error) {
+      throw new ForbiddenException(error);
+    }
+    if (!user || !session) {
+      // this should not occur if no error above
+      throw new ForbiddenException('Failed to obtain an auth session')
+    }
+
+    // same response as successful signIn
+    return { user, accessToken: session.access_token, success: true };
+  }
+
+  async updateUserProfile(userId: string, payload: ProfileUpdateDto) {
+    try {
+      const result = await this.databaseService.db
+        .update(users)
+        .set(payload)
+        .where(eq(users.id, userId))
+        .returning();
+      return result[0]
+    } catch (error) {
+      console.error(error);
+      throw new UnprocessableEntityException('Unable to update user profile')
+    }
+  }
+
+  async updatePassword(authId: string, password: string) {
+    const supabase = this.supabaseService.getServiceClient();
+    const { error } = await supabase.auth.admin.updateUserById(authId, { password });
+    if (error) {
+      console.error(error);
+      throw new BadRequestException(error);
+    }
+    return {
+      success: true
+    }
+  }
+
+  async sendPasswordRecoveryToken(email: string) {
+    const supabase = this.supabaseService.getServiceClient();
+    const { data, error } = await supabase.auth.admin.generateLink({
+      email,
+      type: 'recovery',
+    });
+    if (error) {
+      throw new BadRequestException({
+        message: 'Failed to initiate password recovery',
+        details: error.message,
+        status: error.status,
+      });
+    }
+
+    const { email_otp } = data.properties
+    const msgInfo = await this.mailerService.send({
+      template: join(__dirname, 'email', 'recovery'),
+      message: {
+        to: email,
+      },
+      locals: {
+        token: email_otp,
+      },
+    });
+
+    const { rejected, rejectedErrors } = msgInfo;
+
+    if (rejected.length > 0) {
+      console.error(rejectedErrors?.at(0))
+      throw new UnprocessableEntityException(
+        'Email sending failed',
+        rejectedErrors?.at(0)?.message
+      )
+    }
+  }
+
+  async recoverAccount(email: string, token: string) {
+    const supabase = this.supabaseService.getClient();
+    const {
+      data: { user, session },
+      error,
+    } = await supabase.auth.verifyOtp({ email, token, type: 'recovery' });
+
+    if (error) {
+      throw new ForbiddenException(error);
+    }
+    if (!user || !session) {
+      // this should not occur if no error above
+      throw new ForbiddenException('Failed to obtain an auth session')
+    }
+
+    // same response as successful signIn
+    return { user, accessToken: session.access_token, success: true };
   }
 
   /**

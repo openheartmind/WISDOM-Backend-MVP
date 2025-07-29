@@ -1,5 +1,6 @@
-import { IsBoolean, IsEmail } from 'class-validator';
+import { IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import type { User } from '@supabase/auth-js';
 
 export class AuthenticateDto {
   @ApiProperty({
@@ -12,9 +13,17 @@ export class AuthenticateDto {
 
 export class AuthenticateResponseDto {
   @ApiProperty({
-    example: true,
-    description: 'Indicates if authentication was successful',
+    description: 'Supabase Auth user',
   })
-  @IsBoolean()
+  readonly user: User;
+
+  @ApiProperty({
+    description: 'JWT'
+  })
+  readonly accessToken: string;
+
+  @ApiProperty({
+    description: 'Indicates authentication succeeded'
+  })
   readonly success: boolean;
 }

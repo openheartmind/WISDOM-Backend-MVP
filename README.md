@@ -16,7 +16,7 @@ git clone https://github.com/openheartmind/WISDOM-Backend-MVP
 
 Next, open the cloned repository with your IDE and in the terminal window, execute the installation command:
 ```
-npm i
+pnpm install
 ```
 
 Next, we install Supabase as a local copy. Run the following command to initialize it on your machine:
@@ -29,7 +29,7 @@ npx supabase init
 npx supabase db reset
 ```
 
-After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again. Best to run the generate command as well to make sure all the latest schema changes are present -
+After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again -
 
 ```
 npx drizzle-kit migrate
@@ -58,6 +58,13 @@ Once Supabase was successfully initialized and running, we run the Drizzle migra
 npx drizzle-kit migrate
 ```
 
+To seed the database with the initial data, run:
+
+```
+npm run db:seed
+```
+
+
 If any changes are made to the local schema files, the following command needs to be executed to re-create the SQL files with these changes, followed by the command to apply it on the database.
 ```
 npx drizzle-kit generate
@@ -66,14 +73,14 @@ npx drizzle-kit migrate
 
 Finally, we are ready to run the development environment by running the following command:
 ```
-npm run start:dev
+pnpm run start:dev
 ```
 
 At this point, your backend should be running.
 
 To complie the project for production, run the following:
 ```
-npm run start:prod
+pnpm run start:prod
 ```
 
 ## Run tests
@@ -81,13 +88,13 @@ npm run start:prod
 ### Automated Tests
 ```bash
 # unit tests
-$ npm run test
+$ pnpm run test
 
 # e2e tests
-$ npm run test:e2e
+$ pnpm run test:e2e
 
 # test coverage
-$ npm run test:cov
+$ pnpm run test:cov
 ```
 
 ### Manual Workflows - User Creation
@@ -159,9 +166,19 @@ It's most likely that you have conflicts. The following command should resolve i
 npx supabase db reset
 ```
 
-After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again. Best to run the generate command as well to make sure all the latest schema changes are present -
+After resetting the database, all data will be removed and you will need to recreate the tables by running the migration again -
 
 ```
-npx drizzle-kit generate
 npx drizzle-kit migrate
+npm run db:seed
+```
+
+### Docker Error - failed to start docker container: Error response from daemon: ports are not available: exposing port TCP 0.0.0.0:54322 -> 127.0.0.1:0: listen tcp 0.0.0.0:54322: bind: An attempt was made to access a socket in a way forbidden by its access permissions
+Make sure Docker runs properly on your machine. It might require some updates.
+If it is running but failing to start the instance, the ports are blocked on your machine.
+On a windows machine, use the following commands to solve this -
+```
+net stop winnat
+netsh int ipv4 add excludedportrange protocol=tcp startport=54322 numberofports=1
+net start winnat
 ```
