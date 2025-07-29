@@ -1,5 +1,5 @@
 // src/database/schema/contributions.ts
-import { pgTable, serial, text, timestamp, integer, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, boolean } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users } from './users';
 import { instances } from './instances';
@@ -11,7 +11,10 @@ export const contributions = pgTable('contributions', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
   contributorId: uuid('contributor_id').references(() => users.id),
-  instanceId: uuid('instance_id').notNull().references(() => instances.id, { onDelete: 'cascade' }),
+  isMeta: boolean('is_meta'),
+  instanceId: uuid('instance_id')
+    .notNull()
+    .references(() => instances.id, { onDelete: 'cascade' }),
 });
 
 export const contributionsRelations = relations(contributions, ({ one }) => ({

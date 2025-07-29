@@ -3,3 +3,5 @@ export * from './instances';
 export * from './dimensions';
 export * from './memberships';
 export * from './contributions';
+export * from './pairings';
+export * from './reviews';
