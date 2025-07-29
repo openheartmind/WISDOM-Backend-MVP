@@ -29,16 +29,8 @@ import { GetUser } from './decorator/get-user.decorator';
 import { User } from 'src/database/schema';
 import { AuthGuard } from './auth.guard';
 import { DecodeInviteResponseDto } from './dto/decode-invite.dto';
-import { ProfileUpdateDto } from './dto/profile.dto';
 import { InitRecoverPasswordDto, PasswordDto, RecoveryTokenAuthDto } from './dto/password.dto';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { ProfileUpdateDto } from './dto/profile.dto';
-import { InitRecoverPasswordDto, PasswordDto, RecoveryTokenAuthDto } from './dto/password.dto';
-=======
->>>>>>> 3c6de4c (remove duplicate code)
-=======
->>>>>>> refs/remotes/origin/feat/92-user-profile-update
 
 @Controller('auth')
 export class AuthController {
@@ -46,8 +38,21 @@ export class AuthController {
 
   @Post('/sign-up')
   @ApiOperation({ summary: 'Sign up user using email and password' })
-  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
-  @ApiResponse({ status: HttpStatus.OK, type: AuthenticateResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, type: AuthenticateResponseDto, description: 'Successfully signed up' })
+  @ApiResponse({ 
+    status: HttpStatus.BAD_REQUEST, 
+    description: 'Sign-up failed - account already exists, invalid email, weak password, or rate limited',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Account already exists' },
+        details: { type: 'string', example: 'An account with this email address already exists. Please try signing in instead, or use a different email address.' },
+        code: { type: 'string', example: 'USER_ALREADY_EXISTS' },
+        status: { type: 'number', example: 400 },
+        timestamp: { type: 'string', format: 'date-time' }
+      }
+    }
+  })
   @ApiBody({ type: SignUpDto })
   async signUp(@Body() signUpDto: SignUpDto): Promise<SignUpResponseDto> {
     return await this.authService.signUp(signUpDto);
@@ -59,13 +64,26 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   @ApiResponse({ status: HttpStatus.OK, type: SuccessDto })
   async confirmSignUp(@Body() payload: SignUpConfirmDto) {
-    return await this.authService.confirmSignUp(payload.hashedToken);
+    return await this.authService.confirmSignUp(payload.token);
   }
 
   @Post('/sign-in')
   @ApiOperation({ summary: 'Sign in user using email and password' })
-  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
-  @ApiResponse({ status: HttpStatus.OK, type: AuthenticateResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, type: AuthenticateResponseDto, description: 'Successfully signed in' })
+  @ApiResponse({ 
+    status: HttpStatus.UNAUTHORIZED, 
+    description: 'Authentication failed - invalid credentials, email not verified, account disabled, or rate limited',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Invalid credentials' },
+        details: { type: 'string', example: 'The email or password provided is incorrect. Please check your credentials and try again.' },
+        code: { type: 'string', example: 'INVALID_CREDENTIALS' },
+        status: { type: 'number', example: 401 },
+        timestamp: { type: 'string', format: 'date-time' }
+      }
+    }
+  })
   @ApiBody({ type: SignInDto })
   async signIn(@Body() signInDto: SignInDto): Promise<SignInResponseDto> {
     return await this.authService.signIn(signInDto);
