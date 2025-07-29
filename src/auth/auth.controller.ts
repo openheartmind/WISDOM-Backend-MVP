@@ -55,7 +55,7 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   @ApiResponse({ status: HttpStatus.OK, type: SuccessDto })
   async confirmSignUp(@Body() payload: SignUpConfirmDto) {
-    return await this.authService.confirmSignUp(payload.hashedToken);
+    return await this.authService.confirmSignUp(payload.token);
   }
 
   @Post('/sign-in')
