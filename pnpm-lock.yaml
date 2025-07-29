@@ -32,9 +32,15 @@ importers:
       class-validator:
         specifier: ^0.14.1
         version: 0.14.2
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.6.1
       drizzle-orm:
         specifier: ^0.38.3
         version: 0.38.4(@electric-sql/pglite@0.2.17)(@types/pg@8.15.4)(pg@8.16.3)
+      drizzle-seed:
+        specifier: ^0.3.1
+        version: 0.3.1(drizzle-orm@0.38.4(@electric-sql/pglite@0.2.17)(@types/pg@8.15.4)(pg@8.16.3))
       email-templates:
         specifier: ^12.0.1
         version: 12.0.3(@babel/core@7.28.0)(ejs@3.1.10)(mustache@4.2.0)(nunjucks@3.2.4(chokidar@3.6.0))(pug@3.0.3)(underscore@1.13.7)
@@ -2404,6 +2410,10 @@ packages:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
 
+  dotenv@16.6.1:
+    resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
+    engines: {node: '>=12'}
+
   drizzle-kit@0.30.6:
     resolution: {integrity: sha512-U4wWit0fyZuGuP7iNmRleQyK2V8wCuv57vf5l3MnG4z4fzNTjY/U13M8owyQ5RavqvqxBifWORaR3wIUzlN64g==}
     hasBin: true
@@ -2498,6 +2508,14 @@ packages:
       sql.js:
         optional: true
       sqlite3:
+        optional: true
+
+  drizzle-seed@0.3.1:
+    resolution: {integrity: sha512-F/0lgvfOAsqlYoHM/QAGut4xXIOXoE5VoAdv2FIl7DpGYVXlAzKuJO+IphkKUFK3Dz+rFlOsQLnMNrvoQ0cx7g==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.4'
+    peerDependenciesMeta:
+      drizzle-orm:
         optional: true
 
   dunder-proto@1.0.1:
@@ -7130,6 +7148,8 @@ snapshots:
 
   dotenv@16.4.5: {}
 
+  dotenv@16.6.1: {}
+
   drizzle-kit@0.30.6:
     dependencies:
       '@drizzle-team/brocli': 0.10.2
@@ -7145,6 +7165,12 @@ snapshots:
       '@electric-sql/pglite': 0.2.17
       '@types/pg': 8.15.4
       pg: 8.16.3
+
+  drizzle-seed@0.3.1(drizzle-orm@0.38.4(@electric-sql/pglite@0.2.17)(@types/pg@8.15.4)(pg@8.16.3)):
+    dependencies:
+      pure-rand: 6.1.0
+    optionalDependencies:
+      drizzle-orm: 0.38.4(@electric-sql/pglite@0.2.17)(@types/pg@8.15.4)(pg@8.16.3)
 
   dunder-proto@1.0.1:
     dependencies:
