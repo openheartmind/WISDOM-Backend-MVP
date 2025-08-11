@@ -5,23 +5,53 @@ import { CreateContributionDto } from './dto/create-contribution.dto';
 import { UpdateContributionDto } from './dto/update-contribution.dto';
 import { contributions } from '../database/schema/contributions';
 import { eq } from 'drizzle-orm';
+import { pairings } from 'src/database/schema';
 
 @Injectable()
 export class ContributionsService {
   constructor(private dbService: DatabaseService) { }
 
   async create(createContributionDto: CreateContributionDto, userId: string) {
-    //TO DO: Check if user has access to instance
-
+    const existing = await this.dbService.db.query.contributions.findMany({
+      where: eq(contributions.instanceId, createContributionDto.instanceId),
+    });
 
     const { title, content, instanceId } = createContributionDto;
 
-    const result = await this.dbService.db.insert(contributions).values({
-      title,
-      content,
-      instanceId,
-      contributorId: userId,
-    }).returning();
+    const result = await this.dbService.db
+      .insert(contributions)
+      .values({
+        title,
+        content,
+        instanceId,
+        contributorId: userId,
+      })
+      .returning();
+
+    if (existing.length) {
+      //TODO: This should be generalized to all dimensions
+      //TODO: All these should be in a transaction?
+      const dimension = await this.dbService.db.query.dimensions.findFirst();
+      existing.forEach(async (contribution) => {
+        await this.dbService.db.insert(pairings).values({
+          instanceId: contribution.instanceId,
+          contribution1Id: result[0].id,
+          contribution2Id: contribution.id,
+          dimensionId: dimension?.id,
+          isMeta: contribution.isMeta,
+          isReviewed: false,
+        });
+
+        await this.dbService.db.insert(pairings).values({
+          instanceId: contribution.instanceId,
+          contribution1Id: contribution.id,
+          contribution2Id: result[0].id,
+          dimensionId: dimension?.id,
+          isMeta: contribution.isMeta,
+          isReviewed: false,
+        });
+      });
+    }
 
     return result[0];
   }
