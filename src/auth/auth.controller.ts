@@ -18,7 +18,11 @@ import {
 } from '@nestjs/swagger';
 import { AuthenticateResponseDto } from './dto/authenticate.dto';
 import { AuthService } from './auth.service';
-import { SignUpDto, SignUpResponseDto, SignUpConfirmDto } from './dto/sign-up.dto';
+import {
+  SignUpDto,
+  SignUpResponseDto,
+  SignUpConfirmDto,
+} from './dto/sign-up.dto';
 import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
 import { SuccessDto } from 'src/dto/success.dto';
 import { GetUser } from './decorator/get-user.decorator';
@@ -30,7 +34,7 @@ import { ProfileUpdateDto } from './dto/profile.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('/sign-up')
   @ApiOperation({ summary: 'Sign up user using email and password' })
@@ -110,7 +114,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Decode and verify an invite token' })
   @ApiQuery({
     name: 'token',
-    description: 'JWT invite token containing the invited user\'s email',
+    description: "JWT invite token containing the invited user's email",
     required: true,
   })
   @ApiResponse({

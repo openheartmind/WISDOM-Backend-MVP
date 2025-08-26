@@ -1,18 +1,20 @@
 // src/contributions/contributions.controller.ts
 import { 
     Controller, Get, Post, Body, Patch, Param, Delete, 
-    UseGuards, Req, Query 
+    UseGuards, Req, Query, 
+    UnauthorizedException
   } from '@nestjs/common';
   import { ContributionsService } from './contributions.service';
   import { CreateContributionDto } from './dto/create-contribution.dto';
   import { UpdateContributionDto } from './dto/update-contribution.dto';
   import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
   import { AuthGuard } from '../auth/auth.guard';
+import { InstanceService } from 'src/instance/instance.service';
   
   @ApiTags('contributions')
   @Controller('contributions')
   export class ContributionsController {
-    constructor(private readonly contributionsService: ContributionsService) {}
+    constructor(private readonly contributionsService: ContributionsService, private readonly instanceService: InstanceService) {}
   
     @Post()
     @UseGuards(AuthGuard)
@@ -20,8 +22,11 @@ import {
     @ApiBody({ type: CreateContributionDto })
     @ApiBearerAuth()
     @ApiResponse({ status: 201, description: 'Contribution created successfully' })
-    create(@Body() createContributionDto: CreateContributionDto, @Req() req) {
+    async create(@Body() createContributionDto: CreateContributionDto, @Req() req) {
       const userId = req.user.id; // Use authId from the user object
+      if (!(await this.instanceService.getRole(createContributionDto.instanceId, userId))) {
+        throw new UnauthorizedException('Not authorized: Not a member of instance');
+      }
       return this.contributionsService.create(createContributionDto, userId);
     }
   
